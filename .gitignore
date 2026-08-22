@@ -1,0 +1,23 @@
+# --- Secrets / local config ---
+# If you ever split your real Supabase URL/keys into a separate config file
+# instead of editing index.html directly, ignore that file here.
+config.local.js
+.env
+.env.local
+
+# --- Supabase CLI local state ---
+.supabase/
+supabase/.temp/
+
+# --- OS cruft ---
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# --- Editor cruft ---
+.vscode/
+*.swp
+
+# --- Node (only relevant if you later add a build step) ---
+node_modules/
+npm-debug.log*
