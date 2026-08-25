@@ -1,0 +1,18 @@
+# Dependencies
+node_modules/
+functions/node_modules/
+
+# Firebase & Local cache
+.firebase/
+firebase-debug.log*
+firestore-debug.log*
+ui-debug.log*
+
+# Environment & Secrets
+.env
+.env.local
+*.secret.json
+
+# OS files
+.DS_Store
+Thumbs.db
