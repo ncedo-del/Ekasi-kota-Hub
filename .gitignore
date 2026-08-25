@@ -13,6 +13,10 @@ ui-debug.log*
 .env.local
 *.secret.json
 
-# OS files
+# OS & Editor cruft
 .DS_Store
 Thumbs.db
+desktop.ini
+.vscode/
+*.swp
+npm-debug.log*
