@@ -10,7 +10,13 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Work+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+
+<!-- Firebase SDK v10 (Compat) -->
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-functions-compat.js"></script>
+
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
   :root {
@@ -24,7 +30,6 @@
     --paper-dark: #F1E1BF;
     --ink: #241A16;
     --muted: #8A7A6C;
-    /* legacy aliases so nothing below has to change meaning */
     --red: var(--chili);
     --red-dark: var(--oxblood);
     --yellow: var(--mustard);
@@ -50,7 +55,6 @@
     letter-spacing: .3px;
   }
 
-  /* Header — torn-wrapper signature, pass 1 */
   header {
     background: linear-gradient(160deg, var(--oxblood) 0%, var(--oxblood-deep) 100%);
     color: var(--paper);
@@ -99,14 +103,12 @@
   .status-open { color: #B9F0D8; font-weight: 800; }
   .status-closed { color: #FFC9B8; font-weight: 800; }
 
-  /* Sections */
   main { padding: 16px; max-width: 600px; margin: 0 auto; }
   h2 {
     font-size: 22px; margin: 22px 0 12px;
     color: var(--oxblood); border-left: 6px solid var(--mustard);
     padding-left: 12px; text-transform: uppercase; letter-spacing: .5px;
   }
-  /* Menu items — torn-wrapper photo, pass 2 of the signature */
   .menu-item {
     background: var(--card); border-radius: 16px;
     margin-bottom: 18px; overflow: hidden;
@@ -169,7 +171,6 @@
     box-shadow: 3px 3px 0 rgba(0,0,0,.15);
   }
 
-  /* Cart bar */
   .cart-bar {
     position: fixed; bottom: 0; left: 0; right: 0;
     background: var(--oxblood); color: var(--paper);
@@ -185,7 +186,6 @@
     font-weight: 800; font-size: 13px;
   }
 
-  /* Modals */
   .modal {
     position: fixed; inset: 0; background: rgba(36,26,22,.55);
     display: none; align-items: flex-end; justify-content: center;
@@ -209,7 +209,6 @@
     font-weight: 700;
   }
 
-  /* Cart items */
   .cart-item {
     background: var(--card); padding: 12px; border-radius: 12px;
     margin-bottom: 8px; display: flex; justify-content: space-between;
@@ -231,7 +230,6 @@
   }
   .cart-total .amount { color: var(--mustard); font-family: 'Anton', sans-serif; font-size: 22px; }
 
-  /* Forms */
   label { display: block; font-size: 13px; font-weight: 700; margin: 14px 0 6px; color: var(--ink); }
   input, select, textarea {
     width: 100%; padding: 12px; border: 1.5px solid var(--border); border-radius: 10px;
@@ -257,7 +255,6 @@
   .submit-btn:active { transform: scale(.98); }
   .submit-btn:disabled { background: #C9BBA8; cursor: not-allowed; box-shadow: none; }
 
-  /* Order confirmation */
   .order-confirm { text-align: center; padding: 20px 0; }
   .order-confirm .check {
     width: 80px; height: 80px; border-radius: 50%;
@@ -286,7 +283,6 @@
     border: 1px dashed var(--border);
   }
 
-  /* Owner dashboard */
   .tab-bar {
     display: flex; background: white; border-radius: 12px;
     margin-bottom: 16px; overflow: hidden; box-shadow: 0 2px 6px rgba(87,5,13,.08);
@@ -317,7 +313,6 @@
   .btn-done { background: #A99884; color: white; }
   .empty-state { text-align: center; padding: 40px 20px; color: var(--muted); font-weight: 500; }
 
-  /* Edit menu */
   .edit-item { background: white; padding: 12px; border-radius: 12px; margin-bottom: 10px; border: 1px solid var(--border); }
   .edit-item-top { display: flex; gap: 10px; align-items: flex-start; margin-bottom: 8px; }
   .edit-photo-box {
@@ -484,7 +479,7 @@
   </div>
 </div>
 
-<!-- OWNER LOGIN MODAL (magic link — no more PIN) -->
+<!-- OWNER LOGIN MODAL -->
 <div class="modal" id="loginModal">
   <div class="modal-content">
     <div class="modal-header">
@@ -567,105 +562,117 @@
 </div>
 
 <script>
-  // CONFIG — fill these in from your Supabase project
-  var SUPABASE_URL = 'YOUR_SUPABASE_URL';
-  var SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
-  var OWNER_ID = 'YOUR_OWNER_UUID'; // owners.id for this shop — same as the owner's auth.users id
+  // CONFIG — fill these in from your Firebase Console (Project Settings > General)
+  var FIREBASE_CONFIG = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_PROJECT_ID.appspot.com",
+    messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+    appId: "YOUR_APP_ID"
+  };
+  var OWNER_ID = 'YOUR_OWNER_UUID'; // Firebase Auth UID for the shop owner
 
-  var supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  // Initialize Firebase
+  firebase.initializeApp(FIREBASE_CONFIG);
+  var db = firebase.firestore();
+  var auth = firebase.auth();
+  var functions = firebase.functions();
+
   // STATE
-  var menu = [];              // rows from menu_items
+  var menu = [];
   var shopInfo = { shop_open: true, wait_time_minutes: 15, phone: '', pay_instructions: '' };
   var cart = [];
-  var session = null;         // current Supabase auth session (owner only)
   var isOwnerLoggedIn = false;
-  var lastSeenOrderId = null;
-  var ordersChannel = null;
-  var menuChannel = null;
-  // INIT
+  var ordersUnsubscribe = null;
+  var menuUnsubscribe = null;
+
   init();
 
-  async function init() {
-    await refreshSession();
-    await loadShopInfo();
-    await loadMenu();
-    subscribeToMenuChanges();
+  function init() {
+    listenToShopInfo();
+    listenToMenu();
 
-    supabase.auth.onAuthStateChange((event, newSession) => {
-      session = newSession;
-      isOwnerLoggedIn = !!session;
+    auth.onAuthStateChanged(function(user) {
+      isOwnerLoggedIn = !!user;
       if (isOwnerLoggedIn) {
         document.getElementById('loginStatusMsg').textContent = '';
         closeModal('loginModal');
         openOwnerDashboard();
+      } else {
+        if (ordersUnsubscribe) { ordersUnsubscribe(); ordersUnsubscribe = null; }
       }
     });
 
+    // Check for email link sign-in completion
+    if (auth.isSignInWithEmailLink(window.location.href)) {
+      var email = window.localStorage.getItem('emailForSignIn');
+      if (!email) {
+        email = window.prompt('Please provide your email for confirmation');
+      }
+      if (email) {
+        auth.signInWithEmailLink(email, window.location.href)
+          .then(function() {
+            window.localStorage.removeItem('emailForSignIn');
+          })
+          .catch(function(err) {
+            alert('Could not sign in: ' + err.message);
+          });
+      }
+    }
+
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('sw.js').catch(() => {});
+      navigator.serviceWorker.register('sw.js').catch(function() {});
     }
   }
 
-  async function refreshSession() {
-    const { data } = await supabase.auth.getSession();
-    session = data.session;
-    isOwnerLoggedIn = !!session;
-  }
-  // SHOP INFO (owners table)
-  async function loadShopInfo() {
-    const { data, error } = await supabase
-      .from('owners')
-      .select('shop_open, wait_time_minutes, phone, pay_instructions')
-      .eq('id', OWNER_ID)
-      .single();
-    if (!error && data) {
-      shopInfo = data;
-      updateStatusBar();
-    }
+  // SHOP INFO (owners collection)
+  function listenToShopInfo() {
+    db.collection('owners').doc(OWNER_ID).onSnapshot(function(doc) {
+      if (doc.exists) {
+        shopInfo = doc.data();
+        updateStatusBar();
+      }
+    });
   }
 
   function updateStatusBar() {
     document.getElementById('shopStatus').textContent = shopInfo.shop_open ? '● OPEN — Taking Orders' : '● CLOSED — Not taking orders';
     document.getElementById('shopStatus').className = shopInfo.shop_open ? 'status-open' : 'status-closed';
-    document.getElementById('waitInfo').textContent = `⏱ ~${shopInfo.wait_time_minutes} min wait`;
-  }
-  // MENU (customer + owner share this data via RLS)
-  async function loadMenu() {
-    const { data, error } = await supabase
-      .from('menu_items')
-      .select('*')
-      .eq('owner_id', OWNER_ID)
-      .order('sort_order', { ascending: true });
-    if (!error) {
-      menu = data || [];
-      renderMenu();
-      if (isOwnerLoggedIn) renderOwnerMenu();
-    }
+    document.getElementById('waitInfo').textContent = '⏱ ~' + (shopInfo.wait_time_minutes || 15) + ' min wait';
   }
 
-  function subscribeToMenuChanges() {
-    menuChannel = supabase
-      .channel('menu-changes')
-      .on('postgres_changes',
-        { event: '*', schema: 'public', table: 'menu_items', filter: `owner_id=eq.${OWNER_ID}` },
-        () => loadMenu()
-      )
-      .subscribe();
+  // MENU (customer + owner)
+  function listenToMenu() {
+    if (menuUnsubscribe) menuUnsubscribe();
+    menuUnsubscribe = db.collection('menu_items')
+      .where('owner_id', '==', OWNER_ID)
+      .orderBy('sort_order', 'asc')
+      .onSnapshot(function(snapshot) {
+        menu = [];
+        snapshot.forEach(function(doc) {
+          menu.push(Object.assign({ id: doc.id }, doc.data()));
+        });
+        renderMenu();
+        if (isOwnerLoggedIn) renderOwnerMenu();
+      }, function(err) {
+        console.error("Menu listener error:", err);
+      });
   }
 
   function renderMenu() {
-    const container = document.getElementById('menuContainer');
+    var container = document.getElementById('menuContainer');
     if (menu.length === 0) {
       container.innerHTML = '<div class="empty-state">😔 No items available right now. Please check back soon!</div>';
       updateCartBar();
       return;
     }
-    let html = '<h2>🔥 Our Menu</h2>';
-    menu.forEach(item => {
-      const inCart = cart.find(c => c.id === item.id);
-      const qty = inCart ? inCart.qty : 0;
-      const hasPhoto = !!item.photo_url;
-      const rand = (item.price_cents / 100).toFixed(0);
+    var html = '<h2>🔥 Our Menu</h2>';
+    menu.forEach(function(item) {
+      var inCart = cart.find(function(c) { return c.id === item.id; });
+      var qty = inCart ? inCart.qty : 0;
+      var hasPhoto = !!item.photo_url;
+      var rand = ((item.price_cents || 0) / 100).toFixed(0);
       html += `
         <div class="menu-item ${!item.available ? 'sold-out' : ''}">
           <div class="item-photo ${hasPhoto ? '' : 'no-photo'}"
@@ -697,7 +704,9 @@
   }
 
   function escapeHtml(s) {
-    return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    return String(s || '').replace(/[&<>"']/g, function(c) {
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+    });
   }
 
   function changeQty(itemId, delta) {
@@ -705,12 +714,12 @@
       alert('Sorry, the shop is currently closed. Please come back later!');
       return;
     }
-    const item = menu.find(i => i.id === itemId);
+    var item = menu.find(function(i) { return i.id === itemId; });
     if (!item || !item.available) return;
-    const existing = cart.find(c => c.id === itemId);
+    var existing = cart.find(function(c) { return c.id === itemId; });
     if (existing) {
       existing.qty += delta;
-      if (existing.qty <= 0) cart = cart.filter(c => c.id !== itemId);
+      if (existing.qty <= 0) cart = cart.filter(function(c) { return c.id !== itemId; });
     } else if (delta > 0) {
       cart.push({ id: itemId, name: item.name, price_cents: item.price_cents, qty: 1, photo_url: item.photo_url, emoji: item.emoji });
     }
@@ -718,9 +727,9 @@
   }
 
   function updateCartBar() {
-    const count = cart.reduce((s, i) => s + i.qty, 0);
-    const total = cart.reduce((s, i) => s + i.qty * i.price_cents, 0) / 100;
-    const bar = document.getElementById('cartBar');
+    var count = cart.reduce(function(s, i) { return s + i.qty; }, 0);
+    var total = cart.reduce(function(s, i) { return s + i.qty * i.price_cents; }, 0) / 100;
+    var bar = document.getElementById('cartBar');
     if (count > 0) {
       bar.classList.add('show');
       document.getElementById('cartCount').textContent = count;
@@ -738,10 +747,10 @@
   }
 
   function renderCartModal() {
-    const total = cart.reduce((s, i) => s + i.qty * i.price_cents, 0) / 100;
-    let html = '';
-    cart.forEach(item => {
-      const hasPhoto = !!item.photo_url;
+    var total = cart.reduce(function(s, i) { return s + i.qty * i.price_cents; }, 0) / 100;
+    var html = '';
+    cart.forEach(function(item) {
+      var hasPhoto = !!item.photo_url;
       html += `
         <div class="cart-item">
           <div class="cart-item-thumb" style="${hasPhoto ? `background-image:url('${item.photo_url}')` : ''}">
@@ -762,61 +771,65 @@
     document.getElementById('cartItems').innerHTML = html;
     document.getElementById('cartTotalAmount').textContent = 'R' + total.toFixed(0);
   }
-  // PLACE ORDER — goes through the place-order Edge Function
+
+  // PLACE ORDER — calls Firebase Cloud Function 'placeOrder'
   async function placeOrder() {
-    const name = document.getElementById('customerName').value.trim();
-    const phone = document.getElementById('customerPhone').value.trim();
-    const notes = document.getElementById('customerNotes').value.trim();
-    const payment = document.querySelector('input[name="payment"]:checked').value;
-    const errorBanner = document.getElementById('cartErrorBanner');
+    var name = document.getElementById('customerName').value.trim();
+    var phone = document.getElementById('customerPhone').value.trim();
+    var notes = document.getElementById('customerNotes').value.trim();
+    var payment = document.querySelector('input[name="payment"]:checked').value;
+    var errorBanner = document.getElementById('cartErrorBanner');
     errorBanner.innerHTML = '';
 
     if (!name) { alert('Please enter your name'); return; }
     if (!phone) { alert('Please enter your phone number'); return; }
     if (cart.length === 0) return;
 
-    const btn = document.getElementById('placeOrderBtn');
+    var btn = document.getElementById('placeOrderBtn');
     btn.disabled = true;
     btn.textContent = 'Placing order…';
 
-    const { data, error } = await supabase.functions.invoke('place-order', {
-      body: {
+    try {
+      var placeOrderFn = functions.httpsCallable('placeOrder');
+      var result = await placeOrderFn({
         owner_id: OWNER_ID,
         customer_name: name,
         customer_phone: phone,
         notes: notes,
         payment_method: payment,
-        items: cart.map(i => ({ menu_item_id: i.id, qty: i.qty })),
+        items: cart.map(function(i) { return { menu_item_id: i.id, qty: i.qty }; })
+      });
+
+      var data = result.data;
+      btn.disabled = false;
+      btn.textContent = 'Place Order';
+
+      document.getElementById('orderNumberDisplay').textContent = '#' + data.order_number;
+      document.getElementById('waitTimeDisplay').textContent = '⏱ Ready in ~' + data.wait_time_minutes + ' minutes';
+      var summary = '<b>Your Order:</b><br>';
+      cart.forEach(function(i) {
+        summary += i.qty + '× ' + escapeHtml(i.name) + ' — R' + ((i.qty * i.price_cents) / 100).toFixed(0) + '<br>';
+      });
+      summary += '<br><b>Total: R' + (data.total_cents / 100).toFixed(0) + '</b><br>Payment: ' + (payment === 'cash' ? '💵 Cash on Pickup' : '📱 Online Payment');
+      document.getElementById('orderSummaryDisplay').innerHTML = summary;
+
+      var payDiv = document.getElementById('paymentInstructions');
+      if (payment === 'online' && data.pay_instructions) {
+        payDiv.innerHTML = '<div class="info-banner" style="text-align:left;"><b>💳 Payment Instructions:</b><br>' + escapeHtml(data.pay_instructions).replace(/\n/g, '<br>') + '</div>';
+      } else if (payment === 'cash') {
+        payDiv.innerHTML = '<div class="info-banner">💵 Please bring <b>R' + (data.total_cents / 100).toFixed(0) + '</b> when you collect.</div>';
+      } else {
+        payDiv.innerHTML = '';
       }
-    });
 
-    btn.disabled = false;
-    btn.textContent = 'Place Order';
-
-    if (error || !data || data.error) {
-      const message = (data && data.error) || 'Something went wrong placing your order. Please try again.';
-      errorBanner.innerHTML = `<div class="error-banner">⚠️ ${escapeHtml(message)}</div>`;
-      return;
+      closeModal('cartModal');
+      document.getElementById('confirmModal').classList.add('show');
+    } catch (err) {
+      btn.disabled = false;
+      btn.textContent = 'Place Order';
+      var msg = err.message || 'Something went wrong placing your order. Please try again.';
+      errorBanner.innerHTML = '<div class="error-banner">⚠️ ' + escapeHtml(msg) + '</div>';
     }
-
-    document.getElementById('orderNumberDisplay').textContent = '#' + data.order_number;
-    document.getElementById('waitTimeDisplay').textContent = `⏱ Ready in ~${data.wait_time_minutes} minutes`;
-    let summary = '<b>Your Order:</b><br>';
-    cart.forEach(i => summary += `${i.qty}× ${escapeHtml(i.name)} — R${((i.qty * i.price_cents) / 100).toFixed(0)}<br>`);
-    summary += `<br><b>Total: R${(data.total_cents / 100).toFixed(0)}</b><br>Payment: ${payment === 'cash' ? '💵 Cash on Pickup' : '📱 Online Payment'}`;
-    document.getElementById('orderSummaryDisplay').innerHTML = summary;
-
-    const payDiv = document.getElementById('paymentInstructions');
-    if (payment === 'online' && data.pay_instructions) {
-      payDiv.innerHTML = `<div class="info-banner" style="text-align:left;"><b>💳 Payment Instructions:</b><br>${escapeHtml(data.pay_instructions).replace(/\n/g, '<br>')}</div>`;
-    } else if (payment === 'cash') {
-      payDiv.innerHTML = `<div class="info-banner">💵 Please bring <b>R${(data.total_cents / 100).toFixed(0)}</b> when you collect.</div>`;
-    } else {
-      payDiv.innerHTML = '';
-    }
-
-    closeModal('cartModal');
-    document.getElementById('confirmModal').classList.add('show');
   }
 
   function resetCart() {
@@ -828,7 +841,8 @@
   }
 
   function closeModal(id) { document.getElementById(id).classList.remove('show'); }
-  // OWNER LOGIN (magic link)
+
+  // OWNER LOGIN (Firebase Auth Email Link)
   function openOwner() {
     if (isOwnerLoggedIn) {
       openOwnerDashboard();
@@ -838,77 +852,91 @@
     }
   }
 
-  async function sendMagicLink() {
-    const email = document.getElementById('ownerEmailInput').value.trim();
-    const statusEl = document.getElementById('loginStatusMsg');
+  function sendMagicLink() {
+    var email = document.getElementById('ownerEmailInput').value.trim();
+    var statusEl = document.getElementById('loginStatusMsg');
     if (!email) { statusEl.textContent = 'Enter your email first.'; return; }
     statusEl.textContent = 'Sending…';
-    const { error } = await supabase.auth.signInWithOtp({
-      email,
-      options: { emailRedirectTo: window.location.href }
+
+    var actionCodeSettings = {
+      url: window.location.href,
+      handleCodeInApp: true
+    };
+
+    auth.sendSignInLinkToEmail(email, actionCodeSettings)
+      .then(function() {
+        window.localStorage.setItem('emailForSignIn', email);
+        statusEl.textContent = '✓ Check your email for the login link.';
+      })
+      .catch(function(error) {
+        statusEl.textContent = 'Error: ' + error.message;
+      });
+  }
+
+  function logoutOwner() {
+    auth.signOut().then(function() {
+      isOwnerLoggedIn = false;
+      if (ordersUnsubscribe) { ordersUnsubscribe(); ordersUnsubscribe = null; }
+      closeModal('ownerModal');
     });
-    statusEl.textContent = error ? `Error: ${error.message}` : '✓ Check your email for the login link.';
   }
 
-  async function logoutOwner() {
-    await supabase.auth.signOut();
-    isOwnerLoggedIn = false;
-    unsubscribeFromOrders();
-    closeModal('ownerModal');
-  }
-
-  async function openOwnerDashboard() {
-    await refreshSession();
+  function openOwnerDashboard() {
     if (!isOwnerLoggedIn) { openOwner(); return; }
-    document.getElementById('accountEmailDisplay').textContent = session.user.email ? `Logged in as ${session.user.email}` : 'Logged in';
-    await renderOwnerOrders();
+    var currentUser = auth.currentUser;
+    document.getElementById('accountEmailDisplay').textContent = (currentUser && currentUser.email) ? 'Logged in as ' + currentUser.email : 'Logged in';
     renderOwnerMenu();
-    await loadSettingsToForm();
+    loadSettingsToForm();
     document.getElementById('ownerModal').classList.add('show');
     subscribeToOrders();
   }
 
   function switchTab(tab) {
-    ['orders','menu','settings'].forEach(t => {
+    ['orders','menu','settings'].forEach(function(t) {
       document.getElementById('tabContent' + t.charAt(0).toUpperCase()+t.slice(1)).style.display = (t === tab) ? '' : 'none';
       document.getElementById('tab' + t.charAt(0).toUpperCase()+t.slice(1)).classList.toggle('active', t === tab);
     });
   }
 
-  // Realtime subscription for new orders — works across devices, unlike the old localStorage version
   function subscribeToOrders() {
-    if (ordersChannel) return;
-    ordersChannel = supabase
-      .channel('orders-channel')
-      .on('postgres_changes',
-        { event: '*', schema: 'public', table: 'orders', filter: `owner_id=eq.${OWNER_ID}` },
-        (payload) => {
-          if (payload.eventType === 'INSERT') playDing();
-          renderOwnerOrders();
-        }
-      )
-      .subscribe();
+    if (ordersUnsubscribe) return;
+    var isFirstLoad = true;
+    ordersUnsubscribe = db.collection('orders')
+      .where('owner_id', '==', OWNER_ID)
+      .orderBy('created_at', 'desc')
+      .limit(100)
+      .onSnapshot(function(snapshot) {
+        var orders = [];
+        snapshot.docChanges().forEach(function(change) {
+          if (change.type === 'added' && !isFirstLoad) {
+            playDing();
+          }
+        });
+        isFirstLoad = false;
+
+        snapshot.forEach(function(doc) {
+          orders.push(Object.assign({ id: doc.id }, doc.data()));
+        });
+        renderOwnerOrdersList(orders);
+      }, function(err) {
+        console.error("Orders listener error:", err);
+      });
   }
-  function unsubscribeFromOrders() {
-    if (ordersChannel) { supabase.removeChannel(ordersChannel); ordersChannel = null; }
-  }
 
-  async function renderOwnerOrders() {
-    const list = document.getElementById('ownerOrdersList');
-    const { data: orders, error } = await supabase
-      .from('orders')
-      .select('*, order_items(*)')
-      .order('created_at', { ascending: false })
-      .limit(100);
+  function renderOwnerOrdersList(orders) {
+    var list = document.getElementById('ownerOrdersList');
+    if (!orders || orders.length === 0) {
+      list.innerHTML = '<div class="empty-state">📭 No orders yet</div>';
+      updateNewOrderBadge([]);
+      return;
+    }
 
-    if (error) { list.innerHTML = '<div class="empty-state">Could not load orders.</div>'; return; }
-    if (!orders || orders.length === 0) { list.innerHTML = '<div class="empty-state">📭 No orders yet</div>'; updateNewOrderBadge(orders || []); return; }
-
-    let html = '';
-    orders.forEach(o => {
-      const time = new Date(o.created_at).toLocaleTimeString('en-ZA', { hour: '2-digit', minute: '2-digit' });
-      const date = new Date(o.created_at).toLocaleDateString('en-ZA');
-      const itemsHtml = o.order_items.map(i => `${i.qty}× ${escapeHtml(i.name)}`).join(', ');
+    var html = '';
+    orders.forEach(function(o) {
+      var createdAtDate = o.created_at ? o.created_at.toDate() : new Date();
+      var time = createdAtDate.toLocaleTimeString('en-ZA', { hour: '2-digit', minute: '2-digit' });
+      var date = createdAtDate.toLocaleDateString('en-ZA');
+      var itemsHtml = (o.order_items || []).map(function(i) { return i.qty + '× ' + escapeHtml(i.name); }).join(', ');
       html += `
         <div class="owner-order ${o.status}">
           <div class="order-head">
@@ -918,7 +946,7 @@
           <div><b>${escapeHtml(o.customer_name)}</b> — 📱 ${escapeHtml(o.customer_phone)}</div>
           <div style="font-size:13px; margin-top:4px;">${itemsHtml}</div>
           ${o.notes ? `<div style="font-size:12px; color:var(--muted); margin-top:4px;">📝 ${escapeHtml(o.notes)}</div>` : ''}
-          <div style="margin-top:6px;"><b>R${(o.total_cents / 100).toFixed(0)}</b> • ${o.payment_method === 'cash' ? '💵 Cash' : '📱 Online'} • Status: <b>${o.status.toUpperCase()}</b></div>
+          <div style="margin-top:6px;"><b>R${((o.total_cents || 0) / 100).toFixed(0)}</b> • ${o.payment_method === 'cash' ? '💵 Cash' : '📱 Online'} • Status: <b>${String(o.status || '').toUpperCase()}</b></div>
           <div class="order-actions">
             ${o.status === 'new' ? `<button class="btn-ready" onclick="setOrderStatus('${o.id}', 'ready')">✓ Mark Ready</button>` : ''}
             ${o.status === 'ready' ? `<button class="btn-done" onclick="setOrderStatus('${o.id}', 'done')">📦 Collected</button>` : ''}
@@ -931,13 +959,12 @@
     updateNewOrderBadge(orders);
   }
 
-  async function setOrderStatus(id, status) {
-    await supabase.from('orders').update({ status }).eq('id', id);
-    renderOwnerOrders();
+  function setOrderStatus(id, status) {
+    db.collection('orders').doc(id).update({ status: status });
   }
 
   function notifyCustomer(order) {
-    let msg;
+    var msg;
     if (order.status === 'ready') {
       msg = `Hi ${order.customer_name}! 👋 Your order *#${order.order_number}* at eKasi Kota Hub is READY for pickup! 🔥`;
     } else if (order.status === 'done') {
@@ -945,44 +972,52 @@
     } else {
       msg = `Hi ${order.customer_name}! 👋 Update on your order *#${order.order_number}* at eKasi Kota Hub:`;
     }
-    let phone = order.customer_phone.replace(/[^0-9]/g, '');
+    var phone = String(order.customer_phone || '').replace(/[^0-9]/g, '');
     if (phone.startsWith('0')) phone = '27' + phone.slice(1);
     window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, '_blank');
   }
 
   function clearDoneOrders() {
-    supabase.from('orders').delete().eq('owner_id', OWNER_ID).eq('status', 'done')
-      .then(() => renderOwnerOrders());
+    db.collection('orders')
+      .where('owner_id', '==', OWNER_ID)
+      .where('status', '==', 'done')
+      .get()
+      .then(function(snapshot) {
+        var batch = db.batch();
+        snapshot.forEach(function(doc) { batch.delete(doc.ref); });
+        return batch.commit();
+      });
   }
 
   function updateNewOrderBadge(orders) {
-    const newCount = orders.filter(o => o.status === 'new').length;
-    const badge = document.getElementById('newOrderBadge');
+    var newCount = orders.filter(function(o) { return o.status === 'new'; }).length;
+    var badge = document.getElementById('newOrderBadge');
     if (newCount > 0) { badge.textContent = newCount; badge.style.display = 'inline-block'; }
     else { badge.style.display = 'none'; }
   }
 
   function playDing() {
     try {
-      const ctx = new (window.AudioContext || window.webkitAudioContext)();
-      const o = ctx.createOscillator(); const g = ctx.createGain();
+      var ctx = new (window.AudioContext || window.webkitAudioContext)();
+      var o = ctx.createOscillator(); var g = ctx.createGain();
       o.connect(g); g.connect(ctx.destination);
       o.frequency.value = 880; g.gain.value = .3;
       o.start(); o.stop(ctx.currentTime + .15);
-      setTimeout(() => {
-        const o2 = ctx.createOscillator(); const g2 = ctx.createGain();
+      setTimeout(function() {
+        var o2 = ctx.createOscillator(); var g2 = ctx.createGain();
         o2.connect(g2); g2.connect(ctx.destination);
         o2.frequency.value = 1320; g2.gain.value = .3;
         o2.start(); o2.stop(ctx.currentTime + .2);
       }, 180);
     } catch(e) {}
   }
-  // MENU EDIT (owner only — RLS enforces this server-side too)
+
+  // MENU EDIT (owner only)
   function renderOwnerMenu() {
-    const list = document.getElementById('ownerMenuList');
-    let html = '';
-    menu.forEach(item => {
-      const hasPhoto = !!item.photo_url;
+    var list = document.getElementById('ownerMenuList');
+    var html = '';
+    menu.forEach(function(item) {
+      var hasPhoto = !!item.photo_url;
       html += `
         <div class="edit-item" data-id="${item.id}">
           <div class="edit-item-top">
@@ -1009,7 +1044,7 @@
           <div class="edit-bottom">
             <div class="price-input">
               <span>R</span>
-              <input type="number" value="${Math.round(item.price_cents / 100)}"
+              <input type="number" value="${Math.round((item.price_cents || 0) / 100)}"
                      onchange="updateMenuField('${item.id}', 'price_cents', (parseInt(this.value)||0) * 100)" min="0" />
             </div>
             <div class="edit-bottom-right">
@@ -1024,37 +1059,37 @@
     list.innerHTML = html;
   }
 
-  async function updateMenuField(id, field, value) {
-    await supabase.from('menu_items').update({ [field]: value }).eq('id', id);
-    // Realtime subscription will refresh menu + owner list automatically.
+  function updateMenuField(id, field, value) {
+    db.collection('menu_items').doc(id).update({ [field]: value });
   }
-  async function toggleAvailable(id, current) {
-    await supabase.from('menu_items').update({ available: !current }).eq('id', id);
+  function toggleAvailable(id, current) {
+    db.collection('menu_items').doc(id).update({ available: !current });
   }
-  async function deleteMenuItem(id) {
+  function deleteMenuItem(id) {
     if (!confirm('Delete this item?')) return;
-    await supabase.from('menu_items').delete().eq('id', id);
+    db.collection('menu_items').doc(id).delete();
   }
-  async function addMenuItem() {
-    await supabase.from('menu_items').insert({
+  function addMenuItem() {
+    db.collection('menu_items').add({
       owner_id: OWNER_ID, name: 'New Item', description: '', emoji: '🍽️',
       price_cents: 0, available: true, sort_order: menu.length,
+      created_at: firebase.firestore.FieldValue.serverTimestamp()
     });
   }
 
-  // Photo upload: compressed client-side, stored as a data URL — fine for now,
-  // move to Supabase Storage if photo volume grows
-  function compressImage(file, maxWidth = 600, quality = 0.7) {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const img = new Image();
-        img.onload = () => {
-          let { width, height } = img;
+  function compressImage(file, maxWidth, quality) {
+    maxWidth = maxWidth || 600;
+    quality = quality || 0.7;
+    return new Promise(function(resolve, reject) {
+      var reader = new FileReader();
+      reader.onload = function(e) {
+        var img = new Image();
+        img.onload = function() {
+          var width = img.width; var height = img.height;
           if (width > maxWidth) { height = Math.round(height * (maxWidth / width)); width = maxWidth; }
-          const canvas = document.createElement('canvas');
+          var canvas = document.createElement('canvas');
           canvas.width = width; canvas.height = height;
-          const ctx = canvas.getContext('2d');
+          var ctx = canvas.getContext('2d');
           ctx.drawImage(img, 0, 0, width, height);
           resolve(canvas.toDataURL('image/jpeg', quality));
         };
@@ -1067,14 +1102,14 @@
   }
 
   async function handlePhotoUpload(itemId, fileInput) {
-    const file = fileInput.files[0];
+    var file = fileInput.files[0];
     if (!file) return;
     if (!file.type.startsWith('image/')) { alert('Please choose an image file'); return; }
     try {
-      const box = document.querySelector(`.edit-photo-box[data-id="${itemId}"]`);
+      var box = document.querySelector(`.edit-photo-box[data-id="${itemId}"]`);
       if (box) box.innerHTML = '<div style="font-size:14px; color:#666;">⏳ Loading...</div>';
-      const dataUrl = await compressImage(file, 600, 0.7);
-      await supabase.from('menu_items').update({ photo_url: dataUrl }).eq('id', itemId);
+      var dataUrl = await compressImage(file, 600, 0.7);
+      await db.collection('menu_items').doc(itemId).update({ photo_url: dataUrl });
     } catch (e) {
       alert('Could not process image: ' + e.message);
       renderOwnerMenu();
@@ -1084,32 +1119,38 @@
   async function removePhoto(itemId, event) {
     event.stopPropagation();
     if (!confirm('Remove this photo?')) return;
-    await supabase.from('menu_items').update({ photo_url: null }).eq('id', itemId);
+    await db.collection('menu_items').doc(itemId).update({ photo_url: null });
   }
+
   // SETTINGS
-  async function loadSettingsToForm() {
-    const { data, error } = await supabase.from('owners').select('*').eq('id', OWNER_ID).single();
-    if (error || !data) return;
-    shopInfo = data;
-    document.getElementById('waitTimeInput').value = data.wait_time_minutes;
-    document.getElementById('ownerPhone').value = data.phone;
-    document.getElementById('payInstructions').value = data.pay_instructions;
-    document.getElementById('shopOpenToggle').classList.toggle('on', data.shop_open);
-    document.getElementById('shopOpenLabel').textContent = data.shop_open ? 'Open' : 'Closed';
-    updateStatusBar();
+  function loadSettingsToForm() {
+    db.collection('owners').doc(OWNER_ID).get().then(function(doc) {
+      if (!doc.exists) return;
+      shopInfo = doc.data();
+      document.getElementById('waitTimeInput').value = shopInfo.wait_time_minutes || 15;
+      document.getElementById('ownerPhone').value = shopInfo.phone || '';
+      document.getElementById('payInstructions').value = shopInfo.pay_instructions || '';
+      document.getElementById('shopOpenToggle').classList.toggle('on', !!shopInfo.shop_open);
+      document.getElementById('shopOpenLabel').textContent = shopInfo.shop_open ? 'Open' : 'Closed';
+      updateStatusBar();
+    });
   }
 
-  async function saveSettings() {
-    const wait_time_minutes = parseInt(document.getElementById('waitTimeInput').value) || 15;
-    const phone = document.getElementById('ownerPhone').value.replace(/[^0-9]/g, '');
-    const pay_instructions = document.getElementById('payInstructions').value;
-    await supabase.from('owners').update({ wait_time_minutes, phone, pay_instructions }).eq('id', OWNER_ID);
-    await loadShopInfo();
+  function saveSettings() {
+    var wait_time_minutes = parseInt(document.getElementById('waitTimeInput').value) || 15;
+    var phone = document.getElementById('ownerPhone').value.replace(/[^0-9]/g, '');
+    var pay_instructions = document.getElementById('payInstructions').value;
+    db.collection('owners').doc(OWNER_ID).set({
+      wait_time_minutes: wait_time_minutes,
+      phone: phone,
+      pay_instructions: pay_instructions
+    }, { merge: true });
   }
 
-  async function toggleShopOpen() {
-    await supabase.from('owners').update({ shop_open: !shopInfo.shop_open }).eq('id', OWNER_ID);
-    await loadSettingsToForm();
+  function toggleShopOpen() {
+    db.collection('owners').doc(OWNER_ID).set({
+      shop_open: !shopInfo.shop_open
+    }, { merge: true });
   }
 </script>
 </body>

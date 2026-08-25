@@ -1,51 +1,61 @@
-# eKasi Kota Hub
+# eKasi Kota Hub — Firebase Edition
 
-A kota & chips ordering app for a Soweto takeaway shop. Customers browse the menu and place orders from their phone; the owner manages the menu, order queue, and shop status from the same page. Orders are validated, rate-limited, and priced entirely server-side — the client never touches anything sensitive.
+A kota & chips ordering app for a Soweto takeaway shop built with **Firebase** (Firestore, Firebase Auth, Cloud Functions, and Firebase Hosting). Customers browse the menu and place orders from their phone; the owner manages the menu, order queue, and shop status from the same page. Orders are validated, rate-limited, and priced entirely server-side in a Firebase Cloud Function.
 
 ## What's in this repo
 
-| File | Purpose |
+| File / Directory | Purpose |
 |---|---|
-| `index.html` | The whole front end — customer ordering flow and owner dashboard, single static file, no build step |
-| `schema.sql` | Supabase Postgres schema, Row Level Security policies, and the order-numbering function |
-| `place-order.ts` | Supabase Edge Function — the only path that can create an order; handles rate limiting, server-side pricing, and the WhatsApp notification |
-| `backend-architecture.md` | How the pieces fit together, plus the client-side snippets that call them |
+| `index.html` | The whole front end — customer ordering flow and owner dashboard, powered by Firebase Web SDK |
+| `firebase.json` | Firebase configuration for Hosting, Cloud Functions, and Firestore |
+| `firestore.rules` | Security rules for `owners`, `menu_items`, `orders`, and rate limits |
+| `firestore.indexes.json` | Compound indexes for Firestore menu and order queries |
+| `functions/` | Firebase Cloud Function (`placeOrder`) handling rate limiting, server-side pricing, and WhatsApp notifications |
+| `backend-architecture.md` | Detailed explanation of the Firebase architecture and client integration |
 
-## Setup (before this will actually work)
+## Setup Instructions
 
-1. Create a Supabase project.
-2. Run `schema.sql` in the Supabase SQL editor.
-3. Create yourself as the owner: sign up once via `supabase.auth.signInWithOtp()`, grab your `auth.users.id` from the dashboard, then insert a matching row into `owners` with your phone number, wait time, and payment instructions.
-4. Deploy the Edge Function:
+### 1. Firebase Project Setup
+1. Log in to the Firebase CLI:
+   ```bash
+   npx -y firebase-tools@latest login
    ```
-   supabase functions deploy place-order
-   supabase secrets set FONNTE_TOKEN=your_fonnte_token
+2. Create a new Firebase project or select an existing one:
+   ```bash
+   npx -y firebase-tools@latest projects:create ekasi-kota-hub
+   npx -y firebase-tools@latest use ekasi-kota-hub
    ```
-5. Open `index.html` and fill in the three config values near the top of the `<script>` block:
-   ```js
-   var SUPABASE_URL = 'your-project-url';
-   var SUPABASE_ANON_KEY = 'your-anon-key';
-   var OWNER_ID = 'your-owner-uuid';
-   ```
+3. Enable **Email/Password** or **Email Link (Passwordless)** sign-in in the Firebase Auth console.
 
-Full detail on each step is in `backend-architecture.md`.
+### 2. Configure `index.html`
+Open `index.html` and replace the placeholder config values with your Firebase Project settings:
+```javascript
+var FIREBASE_CONFIG = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_PROJECT_ID.appspot.com",
+  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+  appId: "YOUR_APP_ID"
+};
+var OWNER_ID = 'YOUR_OWNER_FIREBASE_UID';
+```
 
-## A note on the config values above
+### 3. Deploy to Firebase
+Deploy security rules, Firestore indexes, Cloud Functions, and Firebase Hosting with one command:
+```bash
+npx -y firebase-tools@latest deploy
+```
 
-The anon key is meant to be exposed client-side — Row Level Security on the database is what actually protects the data, not keeping that key secret. It's fine for this to be visible in `index.html`, including in a public repo.
+Set your Fonnte WhatsApp token secret for the Cloud Function (optional):
+```bash
+npx -y firebase-tools@latest functions:secrets:set FONNTE_TOKEN
+```
 
-**The one key that must never appear in this repo, anywhere, in any commit:** `SUPABASE_SERVICE_ROLE_KEY`. That one bypasses RLS entirely. It only ever lives in Supabase's Edge Function secrets (`supabase secrets set`), never in a file.
+## Local Testing & Emulators
 
-## Testing
-
-Since `index.html` is a static file with no build step, the fastest way to get a shareable test link is GitHub Pages:
-
-1. Push this repo to GitHub.
-2. Go to **Settings > Pages** on the repo.
-3. Under "Build and deployment," set source to **Deploy from a branch**, branch `main`, folder `/root`.
-4. GitHub gives you a URL like `https://yourusername.github.io/repo-name/` — that's your live test link.
-
-## Known limitations (by design, for now)
-
-- Menu photos are stored as compressed base64 data URLs directly in the database rather than in object storage. Fine at small scale; move to Supabase Storage if photo volume grows.
-- Customer ordering has no login — the phone number typed at checkout is the identity anchor. Security comes from the Edge Function's server-side rate limiting and validation, not from an auth wall.
+Run the Firebase local emulator suite to test Hosting, Firestore, and Cloud Functions on your machine:
+```bash
+npx -y firebase-tools@latest emulators:start
+```
+Open `http://localhost:5000` to view your app locally.
