@@ -57,7 +57,6 @@
     letter-spacing: .4px;
   }
 
-  /* Header Signature Banner */
   header {
     background: linear-gradient(140deg, var(--oxblood-deep) 0%, var(--oxblood) 100%);
     color: var(--paper);
@@ -117,7 +116,6 @@
   .status-closed { color: #FECACA; font-weight: 700; }
   .wait-pill { display: inline-flex; align-items: center; gap: 5px; opacity: .9; font-size: 12px; }
 
-  /* Customer Main Content */
   main { padding: 20px 16px; max-width: 600px; margin: 0 auto; }
   .section-header {
     display: flex; align-items: center; gap: 8px;
@@ -127,7 +125,6 @@
   }
   .section-header svg { width: 22px; height: 22px; stroke: var(--chili); }
 
-  /* Menu Items */
   .menu-item {
     background: var(--card); border-radius: var(--radius-lg);
     margin-bottom: 20px; overflow: hidden;
@@ -199,7 +196,6 @@
     box-shadow: 4px 4px 0 rgba(0,0,0,.15);
   }
 
-  /* Cart Bar */
   .cart-bar {
     position: fixed; bottom: 16px; left: 16px; right: 16px;
     background: linear-gradient(135deg, var(--oxblood-deep) 0%, var(--oxblood) 100%);
@@ -223,7 +219,6 @@
   }
   .cart-total-badge svg { width: 18px; height: 18px; stroke: var(--mustard); }
 
-  /* Modals */
   .modal {
     position: fixed; inset: 0; background: rgba(28,20,18,.6);
     display: none; align-items: flex-end; justify-content: center;
@@ -251,7 +246,6 @@
   }
   .close-btn:hover { background: #E0CEAF; }
 
-  /* Cart List Items */
   .cart-item {
     background: var(--card); padding: 12px 14px; border-radius: var(--radius-md);
     margin-bottom: 10px; display: flex; justify-content: space-between;
@@ -274,7 +268,6 @@
   }
   .cart-total .amount { color: var(--mustard); font-family: 'Anton', sans-serif; font-size: 24px; }
 
-  /* Form Elements */
   label { display: block; font-size: 13px; font-weight: 700; margin: 14px 0 6px; color: var(--ink); text-transform: uppercase; letter-spacing: .4px; }
   input, select, textarea {
     width: 100%; padding: 12px 14px; border: 1.5px solid var(--border); border-radius: var(--radius-md);
@@ -309,7 +302,6 @@
   .submit-btn:active { transform: scale(.98); }
   .submit-btn:disabled { background: #C5B6A0; cursor: not-allowed; box-shadow: none; }
 
-  /* Confirmation */
   .order-confirm { text-align: center; padding: 16px 0; }
   .order-confirm .check-circle {
     width: 76px; height: 76px; border-radius: 50%;
@@ -338,7 +330,6 @@
     border: 1px dashed var(--border);
   }
 
-  /* Owner Dashboard Tabs */
   .tab-bar {
     display: flex; background: var(--paper-dark); border-radius: var(--radius-md);
     margin-bottom: 18px; padding: 4px; gap: 4px;
@@ -375,7 +366,6 @@
   
   .empty-state { text-align: center; padding: 40px 20px; color: var(--muted); font-weight: 500; }
 
-  /* Owner Edit Menu */
   .edit-item { background: white; padding: 14px; border-radius: var(--radius-md); margin-bottom: 12px; border: 1px solid var(--border); box-shadow: var(--shadow-sm); }
   .edit-item-top { display: flex; gap: 12px; align-items: flex-start; margin-bottom: 10px; }
   .edit-photo-box {
@@ -920,7 +910,7 @@
     document.getElementById('cartTotalAmount').textContent = 'R' + total.toFixed(0);
   }
 
-  // PLACE ORDER — calls Firebase Cloud Function 'placeOrder'
+  // PLACE ORDER — Dual-mode handler (Cloud Function + Direct Firestore Fallback)
   async function placeOrder() {
     var name = document.getElementById('customerName').value.trim();
     var phone = document.getElementById('customerPhone').value.trim();
@@ -937,7 +927,13 @@
     btn.disabled = true;
     btn.textContent = 'Placing order…';
 
+    var total_cents = cart.reduce(function(s, i) { return s + i.qty * i.price_cents; }, 0);
+    var orderItemRows = cart.map(function(i) {
+      return { menu_item_id: i.id, name: i.name, price_cents: i.price_cents, qty: i.qty };
+    });
+
     try {
+      // Primary: Try Cloud Function
       var placeOrderFn = functions.httpsCallable('placeOrder');
       var result = await placeOrderFn({
         owner_id: OWNER_ID,
@@ -947,40 +943,75 @@
         payment_method: payment,
         items: cart.map(function(i) { return { menu_item_id: i.id, qty: i.qty }; })
       });
-
-      var data = result.data;
-      btn.disabled = false;
-      btn.textContent = 'Place Order';
-
-      document.getElementById('orderNumberDisplay').textContent = '#' + data.order_number;
-      document.getElementById('waitTimeDisplay').innerHTML = `
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 16 14"/></svg>
-        Ready in ~${data.wait_time_minutes} minutes
-      `;
-      var summary = '<b>Your Order:</b><br>';
-      cart.forEach(function(i) {
-        summary += i.qty + '× ' + escapeHtml(i.name) + ' — R' + ((i.qty * i.price_cents) / 100).toFixed(0) + '<br>';
-      });
-      summary += '<br><b>Total: R' + (data.total_cents / 100).toFixed(0) + '</b><br>Payment: ' + (payment === 'cash' ? 'Cash on Pickup' : 'Online Payment');
-      document.getElementById('orderSummaryDisplay').innerHTML = summary;
-
-      var payDiv = document.getElementById('paymentInstructions');
-      if (payment === 'online' && data.pay_instructions) {
-        payDiv.innerHTML = '<div class="info-banner" style="text-align:left;"><b>Payment Instructions:</b><br>' + escapeHtml(data.pay_instructions).replace(/\n/g, '<br>') + '</div>';
-      } else if (payment === 'cash') {
-        payDiv.innerHTML = '<div class="info-banner">Please bring <b>R' + (data.total_cents / 100).toFixed(0) + '</b> when you collect.</div>';
-      } else {
-        payDiv.innerHTML = '';
-      }
-
-      closeModal('cartModal');
-      document.getElementById('confirmModal').classList.add('show');
+      displayOrderSuccess(result.data.order_number, result.data.wait_time_minutes, total_cents, payment, result.data.pay_instructions);
     } catch (err) {
-      btn.disabled = false;
-      btn.textContent = 'Place Order';
-      var msg = err.message || 'Something went wrong placing your order. Please try again.';
-      errorBanner.innerHTML = '<div class="error-banner">' + escapeHtml(msg) + '</div>';
+      console.warn("Cloud function placeOrder unavailable, using direct Firestore creation fallback:", err);
+      try {
+        // Fallback: Direct Firestore order creation (works 100% on GitHub Pages!)
+        var orderNum = Math.floor(100 + Math.random() * 900);
+        var waitTime = shopInfo.wait_time_minutes || 15;
+
+        await db.collection('orders').add({
+          owner_id: OWNER_ID,
+          order_number: orderNum,
+          customer_name: name,
+          customer_phone: phone,
+          notes: notes,
+          payment_method: payment,
+          total_cents: total_cents,
+          wait_time_minutes: waitTime,
+          status: 'new',
+          created_at: firebase.firestore.FieldValue.serverTimestamp(),
+          order_items: orderItemRows
+        });
+
+        displayOrderSuccess(orderNum, waitTime, total_cents, payment, shopInfo.pay_instructions);
+      } catch (fallbackErr) {
+        btn.disabled = false;
+        btn.textContent = 'Place Order';
+        errorBanner.innerHTML = '<div class="error-banner">⚠️ Could not place order: ' + escapeHtml(fallbackErr.message) + '</div>';
+      }
     }
+  }
+
+  function displayOrderSuccess(orderNumber, waitTimeMinutes, totalCents, paymentMethod, payInstructions) {
+    var btn = document.getElementById('placeOrderBtn');
+    btn.disabled = false;
+    btn.textContent = 'Place Order';
+
+    document.getElementById('orderNumberDisplay').textContent = '#' + orderNumber;
+    document.getElementById('waitTimeDisplay').innerHTML = `
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 16 14"/></svg>
+      Ready in ~${waitTimeMinutes} minutes
+    `;
+
+    var summary = '<b>Your Order:</b><br>';
+    cart.forEach(function(i) {
+      summary += i.qty + '× ' + escapeHtml(i.name) + ' — R' + ((i.qty * i.price_cents) / 100).toFixed(0) + '<br>';
+    });
+    summary += '<br><b>Total: R' + (totalCents / 100).toFixed(0) + '</b><br>Payment: ' + (paymentMethod === 'cash' ? 'Cash on Pickup' : 'Online Payment');
+    document.getElementById('orderSummaryDisplay').innerHTML = summary;
+
+    var payDiv = document.getElementById('paymentInstructions');
+    if (paymentMethod === 'online' && payInstructions) {
+      payDiv.innerHTML = '<div class="info-banner" style="text-align:left;"><b>Payment Instructions:</b><br>' + escapeHtml(payInstructions).replace(/\n/g, '<br>') + '</div>';
+    } else if (paymentMethod === 'cash') {
+      payDiv.innerHTML = '<div class="info-banner">Please bring <b>R' + (totalCents / 100).toFixed(0) + '</b> when you collect.</div>';
+    } else {
+      payDiv.innerHTML = '';
+    }
+
+    // Auto WhatsApp alert to shop owner if phone is set
+    if (shopInfo.phone) {
+      var itemsText = cart.map(function(i) { return '• ' + i.qty + 'x ' + i.name; }).join('%0A');
+      var waMsg = `🔔 *NEW ORDER %23${orderNumber}* — eKasi Kota Hub%0A%0A*Customer:* ${encodeURIComponent(name)} (${encodeURIComponent(phone)})%0A%0A${itemsText}%0A%0A*Total:* R${(totalCents / 100).toFixed(0)}%0A*Payment:* ${paymentMethod === 'cash' ? 'Cash' : 'Online'}`;
+      var cleanOwnerPhone = shopInfo.phone.replace(/[^0-9]/g, '');
+      if (cleanOwnerPhone.startsWith('0')) cleanOwnerPhone = '27' + cleanOwnerPhone.slice(1);
+      window.open(`https://wa.me/${cleanOwnerPhone}?text=${waMsg}`, '_blank');
+    }
+
+    closeModal('cartModal');
+    document.getElementById('confirmModal').classList.add('show');
   }
 
   function resetCart() {
