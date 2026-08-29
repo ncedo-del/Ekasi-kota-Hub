@@ -597,7 +597,7 @@
   // Deploy the Google Apps Script (see README section "WhatsApp without Blaze")
   // and paste its /exec URL here. Leave blank to skip and rely on the
   // in-dashboard ding + badge instead.
-  var WHATSAPP_RELAY_URL = '';
+  var WHATSAPP_RELAY_URL = 'https://script.google.com/macros/s/AKfycbzqqzHtrGlxQJcGdLtcUU1Eah3jKXOIGcQseVr3mD20yX0g2_cz3dk4NrP2ye-fG9yKxg/exec';
 
   var ICONS = {
     warning: '<svg class="icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 2 21h20L12 3z"/><path d="M12 10v4M12 17h.01"/></svg>',
@@ -621,6 +621,7 @@
   var cart = [];
   var isOwnerLoggedIn = false;
   var ordersUnsubscribe = null;
+  var ordersById = {}; // populated by subscribeToOrders; used by notifyCustomer
   var menuUnsubscribe = null;
 
   init();
@@ -1056,9 +1057,18 @@
         snapshot.forEach(function(doc) {
           orders.push(Object.assign({ id: doc.id }, doc.data()));
         });
+        ordersById = {};
+        orders.forEach(function(o) { ordersById[o.id] = o; });
         renderOwnerOrdersList(orders);
       }, function(err) {
         console.error("Orders listener error:", err);
+        document.getElementById('ownerOrdersList').innerHTML =
+          '<div class="error-banner">' + ICONS.warning +
+          'Could not load orders: ' + escapeHtml(err.message) +
+          (err.code === 'failed-precondition'
+            ? '<br><br>This usually means a required Firestore index is missing. Open the browser console (F12) — Firestore prints a link there that creates it automatically, or create it manually in Firebase Console → Firestore → Indexes.'
+            : '') +
+          '</div>';
       });
   }
 
@@ -1089,7 +1099,7 @@
           <div class="order-actions">
             ${o.status === 'new' ? `<button class="btn-ready" onclick="setOrderStatus('${o.id}', 'ready')">${ICONS.check}Mark Ready</button>` : ''}
             ${o.status === 'ready' ? `<button class="btn-done" onclick="setOrderStatus('${o.id}', 'done')">${ICONS.package}Collected</button>` : ''}
-            <button class="btn-wa" onclick='notifyCustomer(${JSON.stringify(o).replace(/'/g, "&apos;")})'>${ICONS.message}WhatsApp Customer</button>
+            <button class="btn-wa" onclick="notifyCustomer('${o.id}')">${ICONS.message}WhatsApp Customer</button>
           </div>
         </div>
       `;
@@ -1102,7 +1112,9 @@
     db.collection('orders').doc(id).update({ status: status });
   }
 
-  function notifyCustomer(order) {
+  function notifyCustomer(orderId) {
+    var order = ordersById[orderId];
+    if (!order) { alert('Could not find that order — try refreshing the dashboard.'); return; }
     var msg;
     if (order.status === 'ready') {
       msg = `Hi ${order.customer_name}! 👋 Your order *#${order.order_number}* at eKasi Kota Hub is READY for pickup! 🔥`;
