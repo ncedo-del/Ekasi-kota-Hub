@@ -3,433 +3,387 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-<meta name="theme-color" content="#57050D" />
+<meta name="theme-color" content="#7A1620" />
 <title>eKasi Kota Hub — Kotas & Chips, Soweto</title>
 <link rel="manifest" href="manifest.json" />
 <link rel="apple-touch-icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23F0A93A'/><rect x='14' y='34' width='72' height='40' rx='8' fill='%23FBF2E1'/><rect x='14' y='46' width='72' height='8' fill='%23E14B2A'/><rect x='14' y='58' width='72' height='8' fill='%237A1620'/></svg>" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Anton&family=Work+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Work+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
 <!-- Firebase SDK v10 (Compat) -->
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-functions-compat.js"></script>
+<!-- firebase-functions-compat.js removed: no Cloud Functions on the Spark plan -->
 
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
   :root {
     --oxblood: #7A1620;
-    --oxblood-deep: #4A050B;
+    --oxblood-deep: #57050D;
     --chili: #E14B2A;
-    --chili-dark: #C03719;
     --mustard: #F0A93A;
-    --mustard-light: #FDF4E3;
     --teal: #0F6E6B;
-    --teal-dark: #094D4A;
-    --paper: #FAF4E8;
-    --paper-dark: #ECE0CA;
-    --ink: #1C1412;
-    --muted: #7A6C60;
-    --card: #FFFFFF;
-    --border: #E8D9C2;
-    --shadow-sm: 0 2px 6px rgba(45, 10, 15, 0.05);
-    --shadow-md: 0 6px 18px rgba(45, 10, 15, 0.08);
-    --shadow-lg: 0 12px 32px rgba(45, 10, 15, 0.14);
-    --radius-sm: 8px;
-    --radius-md: 14px;
-    --radius-lg: 20px;
+    --teal-deep: #0A4F4D;
+    --paper: #FBF2E1;
+    --paper-dark: #F1E1BF;
+    --ink: #241A16;
+    --muted: #8A7A6C;
+    --red: var(--chili);
+    --red-dark: var(--oxblood);
+    --yellow: var(--mustard);
+    --green: var(--teal);
+    --bg: var(--paper);
+    --card: #ffffff;
+    --text: var(--ink);
+    --border: #EFE0C4;
   }
-
-  html, body { height: 100%; background: var(--paper); }
+  html, body { height: 100%; }
   body {
     font-family: 'Work Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    color: var(--ink);
-    padding-bottom: 110px;
+    background: var(--paper);
+    background-image:
+      repeating-linear-gradient(135deg, rgba(122,22,32,0.025) 0px, rgba(122,22,32,0.025) 2px, transparent 2px, transparent 26px);
+    color: var(--text);
+    padding-bottom: 100px;
     overscroll-behavior-y: contain;
-    background-image: radial-gradient(rgba(122,22,32,0.03) 1px, transparent 0);
-    background-size: 20px 20px;
   }
   h1, h2, h3, .display {
-    font-family: 'Anton', sans-serif;
+    font-family: 'Anton', 'Work Sans', sans-serif;
     font-weight: 400;
-    letter-spacing: .4px;
+    letter-spacing: .3px;
   }
 
   header {
-    background: linear-gradient(140deg, var(--oxblood-deep) 0%, var(--oxblood) 100%);
+    background: linear-gradient(160deg, var(--oxblood) 0%, var(--oxblood-deep) 100%);
     color: var(--paper);
-    padding: 18px 18px 30px;
+    padding: 20px 16px 34px;
     position: sticky; top: 0; z-index: 50;
-    box-shadow: 0 4px 16px rgba(74,5,11,0.25);
+    box-shadow: 0 2px 8px rgba(0,0,0,.2);
     clip-path: polygon(
-      0 0, 100% 0, 100% 90%,
-      95% 100%, 89% 89%, 83% 100%, 77% 89%, 71% 100%, 65% 89%, 59% 100%,
-      53% 89%, 47% 100%, 41% 89%, 35% 100%, 29% 89%, 23% 100%, 17% 89%,
-      11% 100%, 5% 89%, 0 100%
+      0 0, 100% 0, 100% 88%,
+      95% 100%, 89% 87%, 83% 100%, 77% 87%, 71% 100%, 65% 87%, 59% 100%,
+      53% 87%, 47% 100%, 41% 87%, 35% 100%, 29% 87%, 23% 100%, 17% 87%,
+      11% 100%, 5% 87%, 0 100%
     );
   }
-  .header-row { display: flex; justify-content: space-between; align-items: center; }
   .brand { display: flex; align-items: center; gap: 12px; }
   .logo {
-    width: 46px; height: 46px; border-radius: 14px;
+    width: 48px; height: 48px; border-radius: 12px;
     background: var(--mustard);
     display: flex; align-items: center; justify-content: center;
-    box-shadow: 0 3px 8px rgba(0,0,0,.25);
+    box-shadow: 0 2px 6px rgba(0,0,0,.25);
     flex-shrink: 0;
-    transform: rotate(-3deg);
+    transform: rotate(-4deg);
   }
-  .logo svg { width: 32px; height: 32px; }
+  .logo svg { width: 34px; height: 34px; }
   .brand h1 {
-    font-size: 24px; text-transform: uppercase; line-height: 1;
-    text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    font-size: 24px; letter-spacing: .5px; text-transform: uppercase;
+    line-height: 1;
   }
   .brand p {
-    font-size: 11px; opacity: .88; margin-top: 3px;
-    text-transform: uppercase; letter-spacing: 1.4px; font-weight: 700;
+    font-size: 12px; opacity: .85; margin-top: 4px;
+    text-transform: uppercase; letter-spacing: 1.2px; font-weight: 600;
   }
-  
+  .header-row { display: flex; justify-content: space-between; align-items: center; }
   .owner-btn {
-    background: rgba(255,255,255,0.12);
-    color: var(--paper); border: 1px solid rgba(255,255,255,0.25);
-    padding: 8px 14px; border-radius: 20px; font-size: 13px;
-    cursor: pointer; font-weight: 700; display: inline-flex; align-items: center; gap: 6px;
-    backdrop-filter: blur(4px);
-    transition: all .2s;
+    background: rgba(251,242,225,.14);
+    color: var(--paper); border: 1.5px solid rgba(251,242,225,.4);
+    padding: 8px 14px; border-radius: 20px; font-size: 12px;
+    cursor: pointer; font-weight: 700; letter-spacing: .3px;
   }
-  .owner-btn:hover { background: rgba(255,255,255,0.22); }
-  .owner-btn svg { width: 15px; height: 15px; }
-
   .status-bar {
     margin-top: 14px;
-    background: rgba(0,0,0,.25);
-    padding: 9px 14px; border-radius: 10px;
+    background: rgba(0,0,0,.22);
+    padding: 9px 12px; border-radius: 8px;
     font-size: 13px; display: flex; justify-content: space-between; align-items: center;
-    font-weight: 600; border: 1px solid rgba(255,255,255,0.08);
+    font-weight: 600;
   }
-  .status-pill { display: inline-flex; align-items: center; gap: 7px; }
-  .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
-  .status-open .status-dot { background: #34D399; box-shadow: 0 0 8px #34D399; }
-  .status-closed .status-dot { background: #F87171; }
-  .status-open { color: #A7F3D0; font-weight: 700; }
-  .status-closed { color: #FECACA; font-weight: 700; }
-  .wait-pill { display: inline-flex; align-items: center; gap: 5px; opacity: .9; font-size: 12px; }
+  .status-open { color: #B9F0D8; font-weight: 800; }
+  .status-closed { color: #FFC9B8; font-weight: 800; }
 
-  main { padding: 20px 16px; max-width: 600px; margin: 0 auto; }
-  .section-header {
-    display: flex; align-items: center; gap: 8px;
-    font-size: 22px; margin: 16px 0 16px;
-    color: var(--oxblood); border-left: 5px solid var(--mustard);
-    padding-left: 10px; text-transform: uppercase;
+  main { padding: 16px; max-width: 600px; margin: 0 auto; }
+  h2 {
+    font-size: 22px; margin: 22px 0 12px;
+    color: var(--oxblood); border-left: 6px solid var(--mustard);
+    padding-left: 12px; text-transform: uppercase; letter-spacing: .5px;
   }
-  .section-header svg { width: 22px; height: 22px; stroke: var(--chili); }
-
   .menu-item {
-    background: var(--card); border-radius: var(--radius-lg);
-    margin-bottom: 20px; overflow: hidden;
-    box-shadow: var(--shadow-md);
-    transition: transform .18s ease, box-shadow .18s ease;
+    background: var(--card); border-radius: 16px;
+    margin-bottom: 18px; overflow: hidden;
+    box-shadow: 0 4px 14px rgba(87,5,13,.1);
+    transition: transform .15s;
     position: relative;
     border: 1px solid var(--border);
   }
-  .menu-item:hover { box-shadow: var(--shadow-lg); }
   .menu-item:active { transform: scale(.99); }
-  
   .item-photo {
-    width: 100%; height: 185px;
+    width: 100%; height: 190px;
     background: var(--paper-dark) center/cover no-repeat;
     display: flex; align-items: center; justify-content: center;
     position: relative;
     clip-path: polygon(
-      0 0, 100% 0, 100% 92%,
-      95% 100%, 89% 90%, 83% 100%, 77% 90%, 71% 100%, 65% 90%, 59% 100%,
-      53% 90%, 47% 100%, 41% 90%, 35% 100%, 29% 90%, 23% 100%, 17% 90%,
-      11% 100%, 5% 90%, 0 100%
+      0 0, 100% 0, 100% 90%,
+      95% 100%, 89% 88%, 83% 100%, 77% 88%, 71% 100%, 65% 88%, 59% 100%,
+      53% 88%, 47% 100%, 41% 88%, 35% 100%, 29% 88%, 23% 100%, 17% 88%,
+      11% 100%, 5% 88%, 0 100%
     );
-    margin-bottom: -4px;
+    margin-bottom: -6px;
   }
   .item-photo.no-photo {
-    font-size: 72px;
-    background: linear-gradient(135deg, var(--paper-dark) 0%, #E7D09A 100%);
+    font-size: 76px;
+    background: linear-gradient(135deg, var(--paper-dark) 0%, #E9D19C 100%);
   }
   .item-body {
-    padding: 16px 16px 14px; display: flex; gap: 14px; align-items: center;
+    padding: 18px 14px 14px; display: flex; gap: 12px; align-items: center;
   }
   .item-info { flex: 1; min-width: 0; }
-  .item-info h3 { font-size: 20px; margin-bottom: 4px; color: var(--ink); }
-  .item-info p { font-size: 13px; color: var(--muted); line-height: 1.4; font-weight: 500; }
+  .item-info h3 { font-size: 19px; margin-bottom: 4px; letter-spacing: .2px; }
+  .item-info p { font-size: 13px; color: var(--muted); line-height: 1.35; font-weight: 500; }
   .item-price {
-    font-family: 'Anton', sans-serif; color: var(--chili); font-size: 22px; margin-top: 8px;
+    font-family: 'Anton', sans-serif; color: var(--chili); font-size: 20px; margin-top: 8px;
     letter-spacing: .5px;
   }
-
   .add-btn {
-    background: var(--chili); color: white; border: none;
-    width: 44px; height: 44px; border-radius: 50%;
+    background: var(--chili); color: var(--paper); border: none;
+    width: 42px; height: 42px; border-radius: 50%;
     font-size: 24px; font-weight: 700; cursor: pointer;
-    box-shadow: 0 4px 10px rgba(225,75,42,.35);
-    flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center;
-    transition: background .15s, transform .15s;
+    box-shadow: 0 3px 8px rgba(225,75,42,.4);
+    flex-shrink: 0;
   }
-  .add-btn:hover { background: var(--chili-dark); transform: scale(1.05); }
-  .add-btn:active { transform: scale(.95); }
-
+  .add-btn:active { background: var(--oxblood); }
   .qty-control { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
   .qty-control button {
-    background: var(--oxblood); color: white; border: none;
-    width: 34px; height: 34px; border-radius: 50%;
+    background: var(--oxblood); color: var(--paper); border: none;
+    width: 32px; height: 32px; border-radius: 50%;
     font-size: 18px; font-weight: 700; cursor: pointer;
-    display: inline-flex; align-items: center; justify-content: center;
-    box-shadow: var(--shadow-sm);
   }
-  .qty-control span { font-family: 'Anton', sans-serif; min-width: 22px; text-align: center; font-size: 18px; color: var(--oxblood); }
-  
-  .sold-out { opacity: .55; pointer-events: none; }
+  .qty-control span { font-family: 'Anton', sans-serif; min-width: 20px; text-align: center; font-size: 17px; }
+  .sold-out { opacity: .5; pointer-events: none; }
   .sold-out-overlay {
     position: absolute; top: 50%; left: 50%;
     transform: translate(-50%, -50%) rotate(-8deg);
     background: var(--paper); color: var(--oxblood);
-    padding: 7px 18px; border-radius: 6px;
-    font-family: 'Anton', sans-serif; font-size: 18px; letter-spacing: 3px;
+    padding: 7px 18px; border-radius: 4px;
+    font-family: 'Anton', sans-serif; font-size: 17px; letter-spacing: 3px;
     border: 3px solid var(--oxblood);
-    box-shadow: 4px 4px 0 rgba(0,0,0,.15);
+    box-shadow: 3px 3px 0 rgba(0,0,0,.15);
   }
 
   .cart-bar {
-    position: fixed; bottom: 16px; left: 16px; right: 16px;
-    background: linear-gradient(135deg, var(--oxblood-deep) 0%, var(--oxblood) 100%);
-    color: var(--paper);
-    padding: 14px 20px; display: none;
+    position: fixed; bottom: 0; left: 0; right: 0;
+    background: var(--oxblood); color: var(--paper);
+    padding: 15px 16px; display: none;
     justify-content: space-between; align-items: center;
-    box-shadow: 0 10px 25px rgba(74,5,11,.35); z-index: 40;
-    cursor: pointer; font-weight: 700; border-radius: var(--radius-lg);
-    border: 1px solid rgba(255,255,255,0.15);
+    box-shadow: 0 -2px 12px rgba(0,0,0,.25); z-index: 40;
+    cursor: pointer; font-weight: 700;
   }
   .cart-bar.show { display: flex; }
-  .cart-bar-left { display: flex; align-items: center; gap: 10px; font-size: 15px; }
   .cart-count {
     background: var(--mustard); color: var(--oxblood-deep);
-    padding: 4px 10px; border-radius: 12px;
+    padding: 4px 11px; border-radius: 12px;
     font-weight: 800; font-size: 13px;
   }
-  .cart-total-badge {
-    font-family: 'Anton', sans-serif; font-size: 20px; color: var(--mustard);
-    display: flex; align-items: center; gap: 6px;
-  }
-  .cart-total-badge svg { width: 18px; height: 18px; stroke: var(--mustard); }
 
   .modal {
-    position: fixed; inset: 0; background: rgba(28,20,18,.6);
+    position: fixed; inset: 0; background: rgba(36,26,22,.55);
     display: none; align-items: flex-end; justify-content: center;
-    z-index: 100; padding: 0; backdrop-filter: blur(4px);
+    z-index: 100; padding: 0;
   }
   .modal.show { display: flex; animation: fadeIn .2s; }
   @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
   .modal-content {
     background: var(--paper); width: 100%; max-width: 600px;
-    border-radius: 24px 24px 0 0; padding: 22px 20px;
+    border-radius: 22px 22px 0 0; padding: 22px;
     max-height: 92vh; overflow-y: auto;
-    animation: slideUp .25s cubic-bezier(0.16, 1, 0.3, 1);
+    animation: slideUp .25s;
     border-top: 5px solid var(--mustard);
-    box-shadow: 0 -10px 30px rgba(0,0,0,0.2);
   }
   @keyframes slideUp { from { transform: translateY(100%);} to { transform: translateY(0);} }
-  .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
-  .modal-header h2 { margin: 0; border: none; padding: 0; font-size: 22px; color: var(--oxblood); display: flex; align-items: center; gap: 8px; }
-  .modal-header h2 svg { width: 22px; height: 22px; stroke: var(--oxblood); }
+  .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+  .modal-header h2 { margin: 0; border: none; padding: 0; }
   .close-btn {
     background: var(--paper-dark); border: none; width: 36px; height: 36px;
-    border-radius: 50%; cursor: pointer; color: var(--oxblood);
-    display: inline-flex; align-items: center; justify-content: center;
-    transition: background .15s;
+    border-radius: 50%; font-size: 20px; cursor: pointer; color: var(--oxblood);
+    font-weight: 700;
   }
-  .close-btn:hover { background: #E0CEAF; }
 
   .cart-item {
-    background: var(--card); padding: 12px 14px; border-radius: var(--radius-md);
-    margin-bottom: 10px; display: flex; justify-content: space-between;
-    align-items: center; gap: 12px;
-    border: 1px solid var(--border); box-shadow: var(--shadow-sm);
+    background: var(--card); padding: 12px; border-radius: 12px;
+    margin-bottom: 8px; display: flex; justify-content: space-between;
+    align-items: center; gap: 10px;
+    border: 1px dashed var(--border);
   }
   .cart-item-thumb {
-    width: 48px; height: 48px; border-radius: 10px;
+    width: 50px; height: 50px; border-radius: 10px;
     background: var(--paper-dark) center/cover no-repeat;
     display: flex; align-items: center; justify-content: center;
-    font-size: 24px; flex-shrink: 0;
+    font-size: 26px; flex-shrink: 0;
   }
   .cart-item-info { flex: 1; min-width: 0; }
-  .cart-item-info h4 { font-size: 15px; font-weight: 700; }
-  .cart-item-info p { font-size: 13px; color: var(--muted); font-weight: 500; }
+  .cart-item-info h4 { font-size: 14px; font-family: 'Work Sans', sans-serif; font-weight: 700; }
+  .cart-item-info p { font-size: 12px; color: var(--muted); font-weight: 500; }
   .cart-total {
-    background: linear-gradient(135deg, var(--oxblood-deep) 0%, var(--oxblood) 100%);
-    color: var(--paper); padding: 16px 18px; border-radius: var(--radius-md); margin: 16px 0;
+    background: var(--oxblood); color: var(--paper); padding: 16px; border-radius: 12px; margin: 16px 0;
     display: flex; justify-content: space-between; align-items: center; font-size: 16px; font-weight: 700;
   }
-  .cart-total .amount { color: var(--mustard); font-family: 'Anton', sans-serif; font-size: 24px; }
+  .cart-total .amount { color: var(--mustard); font-family: 'Anton', sans-serif; font-size: 22px; }
 
-  label { display: block; font-size: 13px; font-weight: 700; margin: 14px 0 6px; color: var(--ink); text-transform: uppercase; letter-spacing: .4px; }
+  label { display: block; font-size: 13px; font-weight: 700; margin: 14px 0 6px; color: var(--ink); }
   input, select, textarea {
-    width: 100%; padding: 12px 14px; border: 1.5px solid var(--border); border-radius: var(--radius-md);
-    font-size: 15px; background: white; font-family: inherit; color: var(--ink);
-    transition: border-color .15s, box-shadow .15s;
+    width: 100%; padding: 12px; border: 1.5px solid var(--border); border-radius: 10px;
+    font-size: 16px; background: white; font-family: inherit; color: var(--ink);
   }
-  input:focus, select:focus, textarea:focus {
-    outline: none; border-color: var(--chili); box-shadow: 0 0 0 3px rgba(225,75,42,.15);
-  }
-  
-  .payment-options { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 6px; }
+  input:focus, select:focus, textarea:focus { outline: none; border-color: var(--chili); box-shadow: 0 0 0 3px rgba(225,75,42,.15); }
+  .payment-options { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 6px; }
   .payment-options label {
-    margin: 0; padding: 14px; border: 2px solid var(--border); border-radius: var(--radius-md);
-    text-align: center; cursor: pointer; background: white; font-weight: 700;
-    display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: 13px;
+    margin: 0; padding: 12px; border: 2px solid var(--border); border-radius: 10px;
+    text-align: center; cursor: pointer; background: white; font-weight: 600;
   }
   .payment-options input[type="radio"] { display: none; }
-  .payment-options label svg { width: 22px; height: 22px; stroke: var(--muted); }
-  .payment-options input[type="radio"]:checked + div { color: var(--chili); font-weight: 800; }
-  .payment-options label:has(input:checked) { border-color: var(--chili); background: #FDF0EC; }
-  .payment-options label:has(input:checked) svg { stroke: var(--chili); }
+  .payment-options input[type="radio"]:checked + span { color: var(--chili); font-weight: 800; }
+  .payment-options label:has(input:checked) { border-color: var(--chili); background: #FDEDE6; }
 
   .submit-btn {
-    background: var(--chili); color: white; border: none;
-    width: 100%; padding: 16px; border-radius: var(--radius-md);
+    background: var(--chili); color: var(--paper); border: none;
+    width: 100%; padding: 16px; border-radius: 12px;
     font-size: 16px; font-weight: 800; cursor: pointer;
-    margin-top: 18px; letter-spacing: .4px; text-transform: uppercase;
-    box-shadow: 0 4px 12px rgba(225,75,42,.35); transition: background .15s, transform .15s;
-    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    margin-top: 18px; letter-spacing: .3px;
+    box-shadow: 0 4px 10px rgba(225,75,42,.3);
   }
-  .submit-btn:hover { background: var(--chili-dark); }
   .submit-btn:active { transform: scale(.98); }
-  .submit-btn:disabled { background: #C5B6A0; cursor: not-allowed; box-shadow: none; }
+  .submit-btn:disabled { background: #C9BBA8; cursor: not-allowed; box-shadow: none; }
 
-  .order-confirm { text-align: center; padding: 16px 0; }
-  .order-confirm .check-circle {
-    width: 76px; height: 76px; border-radius: 50%;
+  .order-confirm { text-align: center; padding: 20px 0; }
+  .order-confirm .check {
+    width: 80px; height: 80px; border-radius: 50%;
     background: var(--teal); color: white;
     display: flex; align-items: center; justify-content: center;
-    margin: 0 auto 16px; animation: pop .4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    box-shadow: 0 6px 16px rgba(15,110,107,.35);
+    font-size: 44px; margin: 0 auto 16px;
+    animation: pop .4s;
+    box-shadow: 0 4px 12px rgba(15,110,107,.35);
   }
-  .order-confirm .check-circle svg { width: 42px; height: 42px; stroke: white; }
-  @keyframes pop { 0% { transform: scale(0);} 100% { transform: scale(1);} }
+  @keyframes pop { 0% { transform: scale(0);} 60% { transform: scale(1.2);} 100% { transform: scale(1);} }
   .order-number {
-    background: var(--oxblood-deep); color: var(--paper);
-    padding: 16px; border-radius: var(--radius-md);
+    background: var(--oxblood); color: var(--paper);
+    padding: 18px; border-radius: 14px;
     font-family: 'Anton', sans-serif; font-size: 38px;
-    letter-spacing: 4px; margin: 14px 0;
+    letter-spacing: 5px; margin: 14px 0;
     border: 3px dashed var(--mustard);
   }
   .wait-time {
-    background: var(--mustard-light); color: var(--oxblood-deep);
-    border: 1px solid var(--mustard); padding: 12px; border-radius: var(--radius-md);
-    font-size: 16px; font-weight: 800; margin: 12px 0; display: inline-flex; align-items: center; gap: 8px; justify-content: center; width: 100%;
+    background: var(--mustard); color: var(--oxblood-deep);
+    padding: 12px; border-radius: 10px;
+    font-size: 17px; font-weight: 800; margin: 12px 0;
   }
   .order-summary {
-    background: white; padding: 16px; border-radius: var(--radius-md);
+    background: white; padding: 16px; border-radius: 12px;
     text-align: left; margin: 12px 0; font-size: 14px;
     border: 1px dashed var(--border);
   }
 
   .tab-bar {
-    display: flex; background: var(--paper-dark); border-radius: var(--radius-md);
-    margin-bottom: 18px; padding: 4px; gap: 4px;
+    display: flex; background: white; border-radius: 12px;
+    margin-bottom: 16px; overflow: hidden; box-shadow: 0 2px 6px rgba(87,5,13,.08);
   }
   .tab-bar button {
-    flex: 1; padding: 11px 8px; background: transparent; border: none;
+    flex: 1; padding: 13px; background: white; border: none;
     font-size: 13px; font-weight: 700; cursor: pointer; color: var(--muted);
-    border-radius: var(--radius-sm); transition: all .15s;
-    display: flex; align-items: center; justify-content: center; gap: 6px;
+    border-bottom: 3px solid transparent; letter-spacing: .2px;
   }
-  .tab-bar button svg { width: 17px; height: 17px; stroke: var(--muted); }
-  .tab-bar button.active { background: white; color: var(--oxblood); box-shadow: var(--shadow-sm); }
-  .tab-bar button.active svg { stroke: var(--oxblood); }
-
+  .tab-bar button.active { color: var(--chili); border-color: var(--chili); }
   .owner-order {
-    background: white; padding: 16px; border-radius: var(--radius-md); margin-bottom: 12px;
+    background: white; padding: 15px; border-radius: 12px; margin-bottom: 12px;
     border-left: 6px solid var(--mustard);
-    box-shadow: var(--shadow-sm); border-top: 1px solid var(--border); border-right: 1px solid var(--border); border-bottom: 1px solid var(--border);
+    box-shadow: 0 2px 8px rgba(87,5,13,.06);
   }
-  .owner-order.ready { border-left-color: var(--teal); }
-  .owner-order.done { border-left-color: #B5A593; opacity: .7; }
-  .order-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-  .order-num-badge { background: var(--oxblood); color: var(--paper); padding: 4px 10px; border-radius: 8px; font-family: 'Anton', sans-serif; letter-spacing: .5px; font-size: 15px; }
+  .owner-order.ready { border-color: var(--teal); }
+  .owner-order.done { border-color: #C9BBA8; opacity: .65; }
+  .order-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+  .order-num-badge { background: var(--oxblood); color: var(--paper); padding: 4px 11px; border-radius: 8px; font-family: 'Anton', sans-serif; letter-spacing: .5px; }
   .order-time { font-size: 12px; color: var(--muted); font-weight: 600; }
   .order-actions { display: flex; gap: 8px; margin-top: 12px; }
   .order-actions button {
-    flex: 1; padding: 10px; border: none; border-radius: var(--radius-sm);
+    flex: 1; padding: 10px; border: none; border-radius: 9px;
     font-size: 13px; font-weight: 700; cursor: pointer;
-    display: inline-flex; align-items: center; justify-content: center; gap: 6px;
   }
   .btn-ready { background: var(--teal); color: white; }
-  .btn-wa { background: #25D366; color: white; }
-  .btn-done { background: #968674; color: white; }
-  
+  .btn-wa { background: #25d366; color: white; }
+  .btn-done { background: #A99884; color: white; }
   .empty-state { text-align: center; padding: 40px 20px; color: var(--muted); font-weight: 500; }
 
-  .edit-item { background: white; padding: 14px; border-radius: var(--radius-md); margin-bottom: 12px; border: 1px solid var(--border); box-shadow: var(--shadow-sm); }
-  .edit-item-top { display: flex; gap: 12px; align-items: flex-start; margin-bottom: 10px; }
+  .edit-item { background: white; padding: 12px; border-radius: 12px; margin-bottom: 10px; border: 1px solid var(--border); }
+  .edit-item-top { display: flex; gap: 10px; align-items: flex-start; margin-bottom: 8px; }
   .edit-photo-box {
-    width: 86px; height: 86px; border-radius: var(--radius-md);
+    width: 90px; height: 90px; border-radius: 12px;
     background: var(--paper-dark) center/cover no-repeat;
     display: flex; align-items: center; justify-content: center;
-    font-size: 36px; cursor: pointer; flex-shrink: 0;
-    border: 2px dashed var(--muted); position: relative; overflow: hidden;
+    font-size: 40px; cursor: pointer; flex-shrink: 0;
+    border: 2px dashed var(--muted);
+    position: relative;
+    overflow: hidden;
   }
   .edit-photo-box.has-photo { border-style: solid; border-color: var(--teal); }
   .edit-photo-box .photo-hint {
     position: absolute; bottom: 0; left: 0; right: 0;
-    background: rgba(28,20,18,.75); color: white;
-    font-size: 10px; padding: 3px; text-align: center; font-weight: 700;
+    background: rgba(36,26,22,.65); color: white;
+    font-size: 10px; padding: 3px; text-align: center;
+    font-weight: 700;
   }
   .edit-photo-box input[type="file"] { display: none; }
   .edit-fields { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
-  .edit-fields input { padding: 8px 10px; font-size: 13px; }
+  .edit-fields input { padding: 8px; font-size: 14px; }
   .edit-bottom {
     display: flex; gap: 8px; align-items: center; justify-content: space-between;
-    padding-top: 10px; border-top: 1px dashed var(--border);
+    padding-top: 8px; border-top: 1px dashed var(--border);
   }
   .edit-bottom .price-input { display: flex; align-items: center; gap: 4px; }
-  .edit-bottom .price-input span { font-family: 'Anton', sans-serif; color: var(--chili); font-size: 18px; }
-  .edit-bottom input[type="number"] { width: 80px; padding: 7px; font-size: 14px; }
-  .edit-bottom-right { display: flex; gap: 10px; align-items: center; }
-  .avail-label { font-size: 12px; color: var(--muted); font-weight: 700; }
-  
+  .edit-bottom .price-input span { font-family: 'Anton', sans-serif; color: var(--chili); }
+  .edit-bottom input[type="number"] { width: 80px; padding: 8px; font-size: 14px; }
+  .edit-bottom-right { display: flex; gap: 8px; align-items: center; }
+  .avail-label { font-size: 12px; color: var(--muted); margin-right: 4px; font-weight: 600; }
   .toggle {
-    width: 44px; height: 24px; background: #D6C6AC; border-radius: 12px;
-    position: relative; cursor: pointer; flex-shrink: 0; transition: background .2s;
+    width: 44px; height: 24px; background: #D9C9AE; border-radius: 12px;
+    position: relative; cursor: pointer; flex-shrink: 0;
   }
   .toggle.on { background: var(--teal); }
   .toggle::after {
     content: ''; position: absolute; top: 2px; left: 2px;
     width: 20px; height: 20px; background: white; border-radius: 50%;
-    transition: left .2s; box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    transition: .2s;
   }
   .toggle.on::after { left: 22px; }
-  .delete-btn { background: var(--oxblood); color: white; border: none; padding: 8px 12px; border-radius: 8px; cursor: pointer; font-weight: 600; display: inline-flex; align-items: center; }
-
+  .delete-btn { background: var(--oxblood); color: white; border: none; padding: 8px 10px; border-radius: 8px; cursor: pointer; font-weight: 600; }
   .add-item-btn {
-    background: var(--teal); color: white; border: none; padding: 14px;
-    width: 100%; border-radius: var(--radius-md); font-weight: 800; cursor: pointer; margin-top: 12px;
-    letter-spacing: .4px; text-transform: uppercase; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-    box-shadow: 0 4px 10px rgba(15,110,107,.25);
+    background: var(--teal); color: white; border: none; padding: 13px;
+    width: 100%; border-radius: 10px; font-weight: 800; cursor: pointer; margin-top: 10px;
+    letter-spacing: .3px;
+  }
+  .photo-remove-btn {
+    position: absolute; top: 2px; right: 2px;
+    background: rgba(225,75,42,.95); color: white; border: none;
+    width: 22px; height: 22px; border-radius: 50%;
+    font-size: 12px; cursor: pointer; line-height: 1;
+    display: flex; align-items: center; justify-content: center;
   }
 
-  .settings-card { background: white; padding: 16px; border-radius: var(--radius-md); margin-bottom: 12px; border: 1px solid var(--border); box-shadow: var(--shadow-sm); }
-  .settings-card h3 { font-size: 15px; margin-bottom: 10px; color: var(--oxblood); font-family: 'Work Sans', sans-serif; font-weight: 800; text-transform: uppercase; letter-spacing: .4px; }
+  .settings-card { background: white; padding: 16px; border-radius: 12px; margin-bottom: 10px; border: 1px solid var(--border); }
+  .settings-card h3 { font-size: 15px; margin-bottom: 10px; color: var(--oxblood); font-family: 'Work Sans', sans-serif; font-weight: 800; }
   .info-banner {
-    background: var(--mustard-light); border: 1px dashed var(--mustard); padding: 12px;
-    border-radius: var(--radius-sm); font-size: 12px; color: #6B4A0E; margin-bottom: 14px; font-weight: 500; line-height: 1.4;
+    background: #FDF0D5; border: 1px dashed var(--mustard); padding: 11px;
+    border-radius: 10px; font-size: 12px; color: #6B4A0E; margin-bottom: 12px; font-weight: 500;
   }
   .info-banner b { color: var(--oxblood); }
   .error-banner {
-    background: #FCE4DD; border: 1px dashed var(--chili); padding: 12px;
-    border-radius: var(--radius-sm); font-size: 13px; color: var(--oxblood-deep); margin-bottom: 14px; font-weight: 600;
+    background: #FCE4DD; border: 1px dashed var(--chili); padding: 11px;
+    border-radius: 10px; font-size: 13px; color: var(--oxblood-deep); margin-bottom: 12px; font-weight: 600;
   }
-  hr { border: none; border-top: 2px dashed var(--border); margin: 18px 0; }
+  hr { border: none; border-top: 2px dashed var(--border); margin: 16px 0; }
 
   @media (min-width: 700px) {
-    body { padding-bottom: 30px; }
-    .cart-bar { max-width: 600px; margin: 0 auto; bottom: 20px; left: 20px; right: 20px; }
+    body { padding-bottom: 20px; }
+    .cart-bar { max-width: 600px; margin: 0 auto; border-radius: 14px; bottom: 20px; left: 20px; right: 20px; }
   }
 </style>
 </head>
@@ -451,19 +405,11 @@
         <p>Kotas & Chips · Soweto</p>
       </div>
     </div>
-    <button class="owner-btn" onclick="openOwner()">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-      Owner
-    </button>
+    <button class="owner-btn" onclick="openOwner()">Owner</button>
   </div>
   <div class="status-bar">
-    <span id="shopStatus" class="status-pill status-open">
-      <span class="status-dot"></span> OPEN — Taking Orders
-    </span>
-    <span id="waitInfo" class="wait-pill">
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 16 14"/></svg>
-      ~15 min wait
-    </span>
+    <span id="shopStatus" class="status-open">● OPEN — Taking Orders</span>
+    <span id="waitInfo">⏱ ~15 min wait</span>
   </div>
 </header>
 
@@ -474,24 +420,16 @@
 
 <!-- CART BAR -->
 <div class="cart-bar" id="cartBar" onclick="openCart()">
-  <div class="cart-bar-left">
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
-    <span><span class="cart-count" id="cartCount">0</span> &nbsp; View Cart</span>
-  </div>
-  <div class="cart-total-badge" id="cartTotal">R0</div>
+  <span><span class="cart-count" id="cartCount">0</span> &nbsp; View Cart</span>
+  <span id="cartTotal">R0</span>
 </div>
 
 <!-- CART MODAL -->
 <div class="modal" id="cartModal">
   <div class="modal-content">
     <div class="modal-header">
-      <h2>
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
-        Your Order
-      </h2>
-      <button class="close-btn" onclick="closeModal('cartModal')">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-      </button>
+      <h2>🛒 Your Order</h2>
+      <button class="close-btn" onclick="closeModal('cartModal')">✕</button>
     </div>
     <div id="cartErrorBanner"></div>
     <div id="cartItems"></div>
@@ -513,13 +451,11 @@
     <div class="payment-options">
       <label>
         <input type="radio" name="payment" value="cash" checked />
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="12" x="2" y="6" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/></svg>
-        <div>Cash on Pickup</div>
+        <span>💵 Cash on Pickup</span>
       </label>
       <label>
         <input type="radio" name="payment" value="online" />
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="20" x="5" y="2" rx="2" ry="2"/><path d="M12 18h.01"/></svg>
-        <div>Pay Online</div>
+        <span>📱 Pay Online</span>
       </label>
     </div>
 
@@ -531,19 +467,14 @@
 <div class="modal" id="confirmModal">
   <div class="modal-content">
     <div class="order-confirm">
-      <div class="check-circle">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-      </div>
-      <h2 style="border:none; padding:0; justify-content:center;">Order Placed!</h2>
-      <p style="color: var(--muted); margin-top: 6px; font-size:14px;">Show this number when you collect</p>
+      <div class="check">✓</div>
+      <h2 style="border:none; padding:0;">Order Placed!</h2>
+      <p style="color: var(--muted); margin-top: 6px;">Show this number when you collect</p>
       <div class="order-number" id="orderNumberDisplay">#000</div>
-      <div class="wait-time" id="waitTimeDisplay">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 16 14"/></svg>
-        Ready in ~15 minutes
-      </div>
+      <div class="wait-time" id="waitTimeDisplay">⏱ Ready in ~15 minutes</div>
       <div class="order-summary" id="orderSummaryDisplay"></div>
       <div id="paymentInstructions"></div>
-      <button class="submit-btn" style="background: var(--oxblood);" onclick="closeModal('confirmModal'); resetCart();">Done</button>
+      <button class="submit-btn" style="background: var(--red);" onclick="closeModal('confirmModal'); resetCart();">Done</button>
     </div>
   </div>
 </div>
@@ -552,20 +483,13 @@
 <div class="modal" id="loginModal">
   <div class="modal-content">
     <div class="modal-header">
-      <h2>
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-        Owner Login
-      </h2>
-      <button class="close-btn" onclick="closeModal('loginModal')">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-      </button>
+      <h2>🔒 Owner Login</h2>
+      <button class="close-btn" onclick="closeModal('loginModal')">✕</button>
     </div>
-    <p style="color: var(--muted); font-size: 14px;">Sign in or create your shop owner account below.</p>
-    <label>Email Address</label>
-    <input type="email" id="ownerEmailInput" placeholder="owner@ekasikotahub.com" />
-    <label>Password</label>
-    <input type="password" id="ownerPasswordInput" placeholder="Enter password (min 6 chars)" />
-    <button class="submit-btn" onclick="loginOwnerWithEmail()">Login / Sign Up</button>
+    <p style="color: var(--muted); font-size: 14px;">We'll email you a secure login link — no password to remember.</p>
+    <label>Your email</label>
+    <input type="email" id="ownerEmailInput" placeholder="owner@example.com" />
+    <button class="submit-btn" onclick="sendMagicLink()">Send Login Link</button>
     <div id="loginStatusMsg" style="font-size:13px; color:var(--muted); margin-top:10px; text-align:center;"></div>
   </div>
 </div>
@@ -574,37 +498,23 @@
 <div class="modal" id="ownerModal">
   <div class="modal-content">
     <div class="modal-header">
-      <h2>
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-        Owner Dashboard
-      </h2>
-      <button class="close-btn" onclick="closeModal('ownerModal')">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-      </button>
+      <h2>👨‍🍳 Owner Dashboard</h2>
+      <button class="close-btn" onclick="closeModal('ownerModal')">✕</button>
     </div>
     <div class="tab-bar">
-      <button id="tabOrders" class="active" onclick="switchTab('orders')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11h4"/><path d="M12 16h4"/><path d="M8 11h.01"/><path d="M8 16h.01"/></svg>
-        Orders <span id="newOrderBadge" style="display:none; background:var(--chili); color:white; border-radius:10px; padding:2px 6px; font-size:11px;">0</span>
-      </button>
-      <button id="tabMenu" onclick="switchTab('menu')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2v0a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/></svg>
-        Menu
-      </button>
-      <button id="tabSettings" onclick="switchTab('settings')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.38a2 2 0 0 0-.73-2.73l-.15-.09a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
-        Settings
-      </button>
+      <button id="tabOrders" class="active" onclick="switchTab('orders')">📋 Orders <span id="newOrderBadge" style="display:none; background:var(--red); color:white; border-radius:10px; padding:2px 6px; font-size:11px;">0</span></button>
+      <button id="tabMenu" onclick="switchTab('menu')">🍔 Menu</button>
+      <button id="tabSettings" onclick="switchTab('settings')">⚙️ Settings</button>
     </div>
 
     <div id="tabContentOrders">
-      <div class="info-banner">Keep this dashboard open to get real-time sound alerts when new orders arrive.</div>
+      <div class="info-banner">📲 Keep this page open to get sound alerts for new orders — works across devices now.</div>
       <div id="ownerOrdersList"></div>
     </div>
 
     <div id="tabContentMenu" style="display:none;">
       <div class="info-banner">
-        Edit prices, names, descriptions. Tap the <b>photo box</b> to upload a photo for each item. Toggle to mark <b>SOLD OUT</b>.
+        ✏️ Edit prices, names, descriptions. Tap the <b>photo box</b> to upload or take a photo of each item. Toggle to mark <b>SOLD OUT</b>.
       </div>
       <div id="ownerMenuList"></div>
       <button class="add-item-btn" onclick="addMenuItem()">+ Add New Item</button>
@@ -612,47 +522,41 @@
 
     <div id="tabContentSettings" style="display:none;">
       <div class="settings-card">
-        <h3>Shop Status</h3>
+        <h3>🏪 Shop Status</h3>
         <label>Are you taking orders?</label>
         <div style="display:flex; gap:10px; align-items:center; margin-top:8px;">
           <div class="toggle" id="shopOpenToggle" onclick="toggleShopOpen()"></div>
-          <span id="shopOpenLabel" style="font-weight:700;">Open</span>
+          <span id="shopOpenLabel">Open</span>
         </div>
       </div>
 
       <div class="settings-card">
-        <h3>Estimated Waiting Time</h3>
+        <h3>⏱ Estimated Waiting Time</h3>
         <label>Minutes until order is ready</label>
         <input type="number" id="waitTimeInput" min="1" max="120" onchange="saveSettings()" />
       </div>
 
       <div class="settings-card">
-        <h3>WhatsApp Number</h3>
+        <h3>📱 Your WhatsApp Number</h3>
         <label>Order notifications will be sent here</label>
         <input type="tel" id="ownerPhone" placeholder="e.g. 27821234567 (no + or spaces)" onchange="saveSettings()" />
         <p style="font-size: 11px; color: var(--muted); margin-top: 6px;">Use country code (27 for SA) — e.g. <b>27821234567</b></p>
       </div>
 
       <div class="settings-card">
-        <h3>Online Payment Info</h3>
+        <h3>💳 Online Payment Info</h3>
         <label>Payment instructions shown to customer (e.g. EFT, SnapScan link)</label>
         <textarea id="payInstructions" rows="3" placeholder="e.g. SnapScan: https://pos.snapscan.io/qr/XXXXX&#10;OR EFT: FNB 1234567890 — use order # as reference" onchange="saveSettings()"></textarea>
       </div>
 
       <div class="settings-card">
-        <h3>Account</h3>
+        <h3>🔐 Account</h3>
         <p style="font-size: 13px; color: var(--muted);" id="accountEmailDisplay">Logged in</p>
       </div>
 
       <hr>
-      <button class="delete-btn" style="width:100%; padding:12px; justify-content:center;" onclick="if(confirm('Clear all completed orders?')) clearDoneOrders()">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:6px;"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
-        Clear Completed Orders
-      </button>
-      <button class="delete-btn" style="width:100%; padding:12px; margin-top:8px; background:#635647; justify-content:center;" onclick="logoutOwner()">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:6px;"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-        Logout
-      </button>
+      <button class="delete-btn" style="width:100%; padding:12px;" onclick="if(confirm('Clear all completed orders?')) clearDoneOrders()">🗑 Clear Completed Orders</button>
+      <button class="delete-btn" style="width:100%; padding:12px; margin-top:8px; background:#555;" onclick="logoutOwner()">🚪 Logout</button>
     </div>
   </div>
 </div>
@@ -668,13 +572,19 @@
     appId: "1:266403198297:web:8afff54ea351de165c0848",
     measurementId: "G-7JXS4VENVE"
   };
-  var OWNER_ID = 'default_owner_id';
+  var OWNER_ID = 'owner_default_id'; // Firebase Auth UID for the shop owner
 
   // Initialize Firebase
   firebase.initializeApp(FIREBASE_CONFIG);
   var db = firebase.firestore();
   var auth = firebase.auth();
-  var functions = firebase.functions();
+  // firebase.functions() removed — no Cloud Functions on Spark plan
+
+  // ── Optional: free WhatsApp forwarder for NEW ORDER alerts to the owner ──
+  // Deploy the Google Apps Script (see README section "WhatsApp without Blaze")
+  // and paste its /exec URL here. Leave blank to skip and rely on the
+  // in-dashboard ding + badge instead.
+  var WHATSAPP_RELAY_URL = '';
 
   // STATE
   var menu = [];
@@ -683,73 +593,49 @@
   var isOwnerLoggedIn = false;
   var ordersUnsubscribe = null;
   var menuUnsubscribe = null;
-  var shopUnsubscribe = null;
 
   init();
 
   function init() {
+    listenToShopInfo();
+    listenToMenu();
+
     auth.onAuthStateChanged(function(user) {
       isOwnerLoggedIn = !!user;
-      if (user) {
-        OWNER_ID = user.uid;
+      if (isOwnerLoggedIn) {
         document.getElementById('loginStatusMsg').textContent = '';
         closeModal('loginModal');
-        onOwnerAuthenticated(user);
+        openOwnerDashboard();
       } else {
         if (ordersUnsubscribe) { ordersUnsubscribe(); ordersUnsubscribe = null; }
       }
-      listenToShopInfo();
-      listenToMenu();
     });
+
+    // Check for email link sign-in completion
+    if (auth.isSignInWithEmailLink(window.location.href)) {
+      var email = window.localStorage.getItem('emailForSignIn');
+      if (!email) {
+        email = window.prompt('Please provide your email for confirmation');
+      }
+      if (email) {
+        auth.signInWithEmailLink(email, window.location.href)
+          .then(function() {
+            window.localStorage.removeItem('emailForSignIn');
+          })
+          .catch(function(err) {
+            alert('Could not sign in: ' + err.message);
+          });
+      }
+    }
 
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('sw.js').catch(function() {});
     }
   }
 
-  async function loginOwnerWithEmail() {
-    var email = document.getElementById('ownerEmailInput').value.trim();
-    var password = document.getElementById('ownerPasswordInput').value;
-    var statusEl = document.getElementById('loginStatusMsg');
-    if (!email || !password) { statusEl.textContent = 'Enter email and password.'; return; }
-    statusEl.textContent = 'Authenticating…';
-
-    try {
-      var userCred = await auth.signInWithEmailAndPassword(email, password);
-      onOwnerAuthenticated(userCred.user);
-    } catch (err) {
-      if (err.code === 'auth/user-not-found' || err.code === 'auth/invalid-credential') {
-        try {
-          var newUserCred = await auth.createUserWithEmailAndPassword(email, password);
-          onOwnerAuthenticated(newUserCred.user);
-        } catch (createErr) {
-          statusEl.textContent = 'Error: ' + createErr.message;
-        }
-      } else {
-        statusEl.textContent = 'Error: ' + err.message;
-      }
-    }
-  }
-
-  async function onOwnerAuthenticated(user) {
-    OWNER_ID = user.uid;
-    var ownerDoc = await db.collection('owners').doc(user.uid).get();
-    if (!ownerDoc.exists) {
-      await db.collection('owners').doc(user.uid).set({
-        phone: '27821234567',
-        wait_time_minutes: 15,
-        shop_open: true,
-        pay_instructions: 'Cash on Pickup or EFT',
-        created_at: firebase.firestore.FieldValue.serverTimestamp()
-      });
-    }
-    openOwnerDashboard();
-  }
-
   // SHOP INFO (owners collection)
   function listenToShopInfo() {
-    if (shopUnsubscribe) shopUnsubscribe();
-    shopUnsubscribe = db.collection('owners').doc(OWNER_ID).onSnapshot(function(doc) {
+    db.collection('owners').doc(OWNER_ID).onSnapshot(function(doc) {
       if (doc.exists) {
         shopInfo = doc.data();
         updateStatusBar();
@@ -758,18 +644,9 @@
   }
 
   function updateStatusBar() {
-    var statusEl = document.getElementById('shopStatus');
-    if (shopInfo.shop_open) {
-      statusEl.className = 'status-pill status-open';
-      statusEl.innerHTML = '<span class="status-dot"></span> OPEN — Taking Orders';
-    } else {
-      statusEl.className = 'status-pill status-closed';
-      statusEl.innerHTML = '<span class="status-dot"></span> CLOSED — Not taking orders';
-    }
-    document.getElementById('waitInfo').innerHTML = `
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 16 14"/></svg>
-      ~${shopInfo.wait_time_minutes || 15} min wait
-    `;
+    document.getElementById('shopStatus').textContent = shopInfo.shop_open ? '● OPEN — Taking Orders' : '● CLOSED — Not taking orders';
+    document.getElementById('shopStatus').className = shopInfo.shop_open ? 'status-open' : 'status-closed';
+    document.getElementById('waitInfo').textContent = '⏱ ~' + (shopInfo.wait_time_minutes || 15) + ' min wait';
   }
 
   // MENU (customer + owner)
@@ -793,16 +670,11 @@
   function renderMenu() {
     var container = document.getElementById('menuContainer');
     if (menu.length === 0) {
-      container.innerHTML = '<div class="empty-state">No items available right now. Please check back soon!</div>';
+      container.innerHTML = '<div class="empty-state">😔 No items available right now. Please check back soon!</div>';
       updateCartBar();
       return;
     }
-    var html = `
-      <div class="section-header">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 3Z"/></svg>
-        Our Menu
-      </div>
-    `;
+    var html = '<h2>🔥 Our Menu</h2>';
     menu.forEach(function(item) {
       var inCart = cart.find(function(c) { return c.id === item.id; });
       var qty = inCart ? inCart.qty : 0;
@@ -868,10 +740,7 @@
     if (count > 0) {
       bar.classList.add('show');
       document.getElementById('cartCount').textContent = count;
-      document.getElementById('cartTotal').innerHTML = `
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-        R${total.toFixed(0)}
-      `;
+      document.getElementById('cartTotal').textContent = 'R' + total.toFixed(0);
     } else {
       bar.classList.remove('show');
     }
@@ -910,108 +779,181 @@
     document.getElementById('cartTotalAmount').textContent = 'R' + total.toFixed(0);
   }
 
-  // PLACE ORDER — Dual-mode handler (Cloud Function + Direct Firestore Fallback)
+  var RATE_LIMIT_WINDOW_MINUTES = 10;
+  var RATE_LIMIT_MAX_ORDERS = 3;
+
+  // PLACE ORDER — direct Firestore write (no Cloud Function / no Blaze).
+  // Price re-check, rate limiting, and the order-number counter all happen
+  // inside one client-side Firestore transaction, so they stay atomic even
+  // without a server.
   async function placeOrder() {
     var name = document.getElementById('customerName').value.trim();
-    var phone = document.getElementById('customerPhone').value.trim();
+    var phoneRaw = document.getElementById('customerPhone').value.trim();
     var notes = document.getElementById('customerNotes').value.trim();
     var payment = document.querySelector('input[name="payment"]:checked').value;
     var errorBanner = document.getElementById('cartErrorBanner');
     errorBanner.innerHTML = '';
 
     if (!name) { alert('Please enter your name'); return; }
-    if (!phone) { alert('Please enter your phone number'); return; }
+    if (!phoneRaw) { alert('Please enter your phone number'); return; }
     if (cart.length === 0) return;
+
+    var phone = phoneRaw.replace(/\D/g, '');
+    if (!/^[0-9]{9,15}$/.test(phone)) {
+      errorBanner.innerHTML = '<div class="error-banner">⚠️ Please enter a valid phone number.</div>';
+      return;
+    }
+    if (!shopInfo || !shopInfo.shop_open) {
+      errorBanner.innerHTML = '<div class="error-banner">⚠️ Sorry, the shop is currently closed.</div>';
+      return;
+    }
+
+    // Re-price from the LIVE menu array, not the cached cart prices —
+    // this is our stand-in for the server-side price re-check the
+    // Cloud Function used to do.
+    var orderItemRows = [];
+    var total_cents = 0;
+    for (var i = 0; i < cart.length; i++) {
+      var cartLine = cart[i];
+      var liveItem = menu.find(function(m) { return m.id === cartLine.id; });
+      if (!liveItem) {
+        errorBanner.innerHTML = '<div class="error-banner">⚠️ An item in your cart no longer exists. Please review your order.</div>';
+        return;
+      }
+      if (!liveItem.available) {
+        errorBanner.innerHTML = '<div class="error-banner">⚠️ ' + escapeHtml(liveItem.name) + ' just sold out. Please remove it.</div>';
+        return;
+      }
+      var qty = parseInt(cartLine.qty, 10);
+      if (!Number.isInteger(qty) || qty <= 0 || qty > 50) {
+        errorBanner.innerHTML = '<div class="error-banner">⚠️ Invalid quantity.</div>';
+        return;
+      }
+      var lineTotal = (liveItem.price_cents || 0) * qty;
+      total_cents += lineTotal;
+      orderItemRows.push({
+        menu_item_id: liveItem.id,
+        name: liveItem.name || 'Item',
+        price_cents: liveItem.price_cents || 0,
+        qty: qty
+      });
+    }
 
     var btn = document.getElementById('placeOrderBtn');
     btn.disabled = true;
     btn.textContent = 'Placing order…';
 
-    var total_cents = cart.reduce(function(s, i) { return s + i.qty * i.price_cents; }, 0);
-    var orderItemRows = cart.map(function(i) {
-      return { menu_item_id: i.id, name: i.name, price_cents: i.price_cents, qty: i.qty };
-    });
+    var counterRef = db.collection('order_counters').doc(OWNER_ID);
+    var rateLimitRef = db.collection('rate_limits').doc(phone);
+    var orderRef = db.collection('orders').doc();
+    var waitMinutes = shopInfo.wait_time_minutes || 15;
 
     try {
-      // Primary: Try Cloud Function
-      var placeOrderFn = functions.httpsCallable('placeOrder');
-      var result = await placeOrderFn({
-        owner_id: OWNER_ID,
-        customer_name: name,
-        customer_phone: phone,
-        notes: notes,
-        payment_method: payment,
-        items: cart.map(function(i) { return { menu_item_id: i.id, qty: i.qty }; })
-      });
-      displayOrderSuccess(result.data.order_number, result.data.wait_time_minutes, total_cents, payment, result.data.pay_instructions);
-    } catch (err) {
-      console.warn("Cloud function placeOrder unavailable, using direct Firestore creation fallback:", err);
-      try {
-        // Fallback: Direct Firestore order creation (works 100% on GitHub Pages!)
-        var orderNum = Math.floor(100 + Math.random() * 900);
-        var waitTime = shopInfo.wait_time_minutes || 15;
+      var orderNumber = await db.runTransaction(async function(transaction) {
+        var rateLimitDoc = await transaction.get(rateLimitRef);
+        var now = Date.now();
+        var windowMs = RATE_LIMIT_WINDOW_MINUTES * 60000;
+        var newWindowStart, newCount;
 
-        await db.collection('orders').add({
+        if (!rateLimitDoc.exists) {
+          newWindowStart = now;
+          newCount = 1;
+        } else {
+          var d = rateLimitDoc.data();
+          var windowStartMs = d.window_start ? d.window_start.toMillis() : 0;
+          if (now - windowStartMs > windowMs) {
+            newWindowStart = now;
+            newCount = 1;
+          } else if ((d.count || 0) < RATE_LIMIT_MAX_ORDERS) {
+            newWindowStart = windowStartMs;
+            newCount = (d.count || 0) + 1;
+          } else {
+            throw new Error('Too many orders placed recently. Please wait a few minutes and try again.');
+          }
+        }
+
+        var counterDoc = await transaction.get(counterRef);
+        var lastNumber = counterDoc.exists ? (counterDoc.data().last_number || 0) : 0;
+        var nextNumber = lastNumber + 1;
+
+        transaction.set(rateLimitRef, {
+          window_start: firebase.firestore.Timestamp.fromMillis(newWindowStart),
+          count: newCount
+        });
+        transaction.set(counterRef, { last_number: nextNumber }, { merge: true });
+        transaction.set(orderRef, {
           owner_id: OWNER_ID,
-          order_number: orderNum,
-          customer_name: name,
+          order_number: nextNumber,
+          customer_name: name.slice(0, 100),
           customer_phone: phone,
-          notes: notes,
+          notes: notes.slice(0, 500),
           payment_method: payment,
           total_cents: total_cents,
-          wait_time_minutes: waitTime,
+          wait_time_minutes: waitMinutes,
           status: 'new',
           created_at: firebase.firestore.FieldValue.serverTimestamp(),
           order_items: orderItemRows
         });
 
-        displayOrderSuccess(orderNum, waitTime, total_cents, payment, shopInfo.pay_instructions);
-      } catch (fallbackErr) {
-        btn.disabled = false;
-        btn.textContent = 'Place Order';
-        errorBanner.innerHTML = '<div class="error-banner">⚠️ Could not place order: ' + escapeHtml(fallbackErr.message) + '</div>';
+        return nextNumber;
+      });
+
+      // Fire-and-forget WhatsApp alert to the owner — never blocks the
+      // order flow if it fails or isn't configured.
+      notifyOwnerNewOrder(orderNumber, name, phone, notes, payment, total_cents, orderItemRows);
+
+      btn.disabled = false;
+      btn.textContent = 'Place Order';
+
+      document.getElementById('orderNumberDisplay').textContent = '#' + orderNumber;
+      document.getElementById('waitTimeDisplay').textContent = '⏱ Ready in ~' + waitMinutes + ' minutes';
+      var summary = '<b>Your Order:</b><br>';
+      orderItemRows.forEach(function(i) {
+        summary += i.qty + '× ' + escapeHtml(i.name) + ' — R' + ((i.qty * i.price_cents) / 100).toFixed(0) + '<br>';
+      });
+      summary += '<br><b>Total: R' + (total_cents / 100).toFixed(0) + '</b><br>Payment: ' + (payment === 'cash' ? '💵 Cash on Pickup' : '📱 Online Payment');
+      document.getElementById('orderSummaryDisplay').innerHTML = summary;
+
+      var payDiv = document.getElementById('paymentInstructions');
+      if (payment === 'online' && shopInfo.pay_instructions) {
+        payDiv.innerHTML = '<div class="info-banner" style="text-align:left;"><b>💳 Payment Instructions:</b><br>' + escapeHtml(shopInfo.pay_instructions).replace(/\n/g, '<br>') + '</div>';
+      } else if (payment === 'cash') {
+        payDiv.innerHTML = '<div class="info-banner">💵 Please bring <b>R' + (total_cents / 100).toFixed(0) + '</b> when you collect.</div>';
+      } else {
+        payDiv.innerHTML = '';
       }
+
+      closeModal('cartModal');
+      document.getElementById('confirmModal').classList.add('show');
+    } catch (err) {
+      btn.disabled = false;
+      btn.textContent = 'Place Order';
+      var msg = err.message || 'Something went wrong placing your order. Please try again.';
+      errorBanner.innerHTML = '<div class="error-banner">⚠️ ' + escapeHtml(msg) + '</div>';
     }
   }
 
-  function displayOrderSuccess(orderNumber, waitTimeMinutes, totalCents, paymentMethod, payInstructions) {
-    var btn = document.getElementById('placeOrderBtn');
-    btn.disabled = false;
-    btn.textContent = 'Place Order';
+  // Sends a NEW ORDER alert to the owner's WhatsApp via a free Google Apps
+  // Script relay (keeps the Fonnte token off the client). No-op if
+  // WHATSAPP_RELAY_URL isn't set — the in-dashboard ding + badge still fire.
+  function notifyOwnerNewOrder(orderNumber, customerName, customerPhone, notes, paymentMethod, totalCents, items) {
+    if (!WHATSAPP_RELAY_URL || !shopInfo || !shopInfo.phone) return;
+    var itemsText = items.map(function(i) {
+      return '• ' + i.qty + '× ' + i.name + ' (R' + ((i.price_cents * i.qty) / 100).toFixed(0) + ')';
+    }).join('\n');
+    var message =
+      '🔔 NEW ORDER #' + orderNumber + ' — eKasi Kota Hub\n\n' +
+      customerName + '\n' + customerPhone + '\n\n' +
+      itemsText + '\n\n' +
+      'Total: R' + (totalCents / 100).toFixed(0) + '\n' +
+      'Payment: ' + (paymentMethod === 'cash' ? 'Cash on Pickup' : 'Online') +
+      (notes ? '\n\nNotes: ' + notes : '');
 
-    document.getElementById('orderNumberDisplay').textContent = '#' + orderNumber;
-    document.getElementById('waitTimeDisplay').innerHTML = `
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 16 14"/></svg>
-      Ready in ~${waitTimeMinutes} minutes
-    `;
-
-    var summary = '<b>Your Order:</b><br>';
-    cart.forEach(function(i) {
-      summary += i.qty + '× ' + escapeHtml(i.name) + ' — R' + ((i.qty * i.price_cents) / 100).toFixed(0) + '<br>';
-    });
-    summary += '<br><b>Total: R' + (totalCents / 100).toFixed(0) + '</b><br>Payment: ' + (paymentMethod === 'cash' ? 'Cash on Pickup' : 'Online Payment');
-    document.getElementById('orderSummaryDisplay').innerHTML = summary;
-
-    var payDiv = document.getElementById('paymentInstructions');
-    if (paymentMethod === 'online' && payInstructions) {
-      payDiv.innerHTML = '<div class="info-banner" style="text-align:left;"><b>Payment Instructions:</b><br>' + escapeHtml(payInstructions).replace(/\n/g, '<br>') + '</div>';
-    } else if (paymentMethod === 'cash') {
-      payDiv.innerHTML = '<div class="info-banner">Please bring <b>R' + (totalCents / 100).toFixed(0) + '</b> when you collect.</div>';
-    } else {
-      payDiv.innerHTML = '';
-    }
-
-    // Auto WhatsApp alert to shop owner if phone is set
-    if (shopInfo.phone) {
-      var itemsText = cart.map(function(i) { return '• ' + i.qty + 'x ' + i.name; }).join('%0A');
-      var waMsg = `🔔 *NEW ORDER %23${orderNumber}* — eKasi Kota Hub%0A%0A*Customer:* ${encodeURIComponent(name)} (${encodeURIComponent(phone)})%0A%0A${itemsText}%0A%0A*Total:* R${(totalCents / 100).toFixed(0)}%0A*Payment:* ${paymentMethod === 'cash' ? 'Cash' : 'Online'}`;
-      var cleanOwnerPhone = shopInfo.phone.replace(/[^0-9]/g, '');
-      if (cleanOwnerPhone.startsWith('0')) cleanOwnerPhone = '27' + cleanOwnerPhone.slice(1);
-      window.open(`https://wa.me/${cleanOwnerPhone}?text=${waMsg}`, '_blank');
-    }
-
-    closeModal('cartModal');
-    document.getElementById('confirmModal').classList.add('show');
+    fetch(WHATSAPP_RELAY_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({ target: shopInfo.phone, message: message })
+    }).catch(function(e) { console.error('WhatsApp relay error:', e); });
   }
 
   function resetCart() {
@@ -1024,6 +966,7 @@
 
   function closeModal(id) { document.getElementById(id).classList.remove('show'); }
 
+  // OWNER LOGIN (Firebase Auth Email Link)
   function openOwner() {
     if (isOwnerLoggedIn) {
       openOwnerDashboard();
@@ -1031,6 +974,27 @@
       document.getElementById('loginStatusMsg').textContent = '';
       document.getElementById('loginModal').classList.add('show');
     }
+  }
+
+  function sendMagicLink() {
+    var email = document.getElementById('ownerEmailInput').value.trim();
+    var statusEl = document.getElementById('loginStatusMsg');
+    if (!email) { statusEl.textContent = 'Enter your email first.'; return; }
+    statusEl.textContent = 'Sending…';
+
+    var actionCodeSettings = {
+      url: window.location.href,
+      handleCodeInApp: true
+    };
+
+    auth.sendSignInLinkToEmail(email, actionCodeSettings)
+      .then(function() {
+        window.localStorage.setItem('emailForSignIn', email);
+        statusEl.textContent = '✓ Check your email for the login link.';
+      })
+      .catch(function(error) {
+        statusEl.textContent = 'Error: ' + error.message;
+      });
   }
 
   function logoutOwner() {
@@ -1086,7 +1050,7 @@
   function renderOwnerOrdersList(orders) {
     var list = document.getElementById('ownerOrdersList');
     if (!orders || orders.length === 0) {
-      list.innerHTML = '<div class="empty-state">No orders yet</div>';
+      list.innerHTML = '<div class="empty-state">📭 No orders yet</div>';
       updateNewOrderBadge([]);
       return;
     }
@@ -1103,25 +1067,14 @@
             <span class="order-num-badge">#${o.order_number}</span>
             <span class="order-time">${time} • ${date}</span>
           </div>
-          <div><b>${escapeHtml(o.customer_name)}</b> — ${escapeHtml(o.customer_phone)}</div>
+          <div><b>${escapeHtml(o.customer_name)}</b> — 📱 ${escapeHtml(o.customer_phone)}</div>
           <div style="font-size:13px; margin-top:4px;">${itemsHtml}</div>
-          ${o.notes ? `<div style="font-size:12px; color:var(--muted); margin-top:4px;">Note: ${escapeHtml(o.notes)}</div>` : ''}
-          <div style="margin-top:6px;"><b>R${((o.total_cents || 0) / 100).toFixed(0)}</b> • ${o.payment_method === 'cash' ? 'Cash' : 'Online'} • Status: <b>${String(o.status || '').toUpperCase()}</b></div>
+          ${o.notes ? `<div style="font-size:12px; color:var(--muted); margin-top:4px;">📝 ${escapeHtml(o.notes)}</div>` : ''}
+          <div style="margin-top:6px;"><b>R${((o.total_cents || 0) / 100).toFixed(0)}</b> • ${o.payment_method === 'cash' ? '💵 Cash' : '📱 Online'} • Status: <b>${String(o.status || '').toUpperCase()}</b></div>
           <div class="order-actions">
-            ${o.status === 'new' ? `
-              <button class="btn-ready" onclick="setOrderStatus('${o.id}', 'ready')">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                Mark Ready
-              </button>` : ''}
-            ${o.status === 'ready' ? `
-              <button class="btn-done" onclick="setOrderStatus('${o.id}', 'done')">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
-                Collected
-              </button>` : ''}
-            <button class="btn-wa" onclick='notifyCustomer(${JSON.stringify(o).replace(/'/g, "&apos;")})'>
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.301-.15-1.78-.878-2.057-.978-.277-.1-.478-.15-.678.15-.2.3-.778.978-.953 1.178-.175.2-.35.225-.651.075-.3-.15-1.268-.467-2.417-1.493-.893-.798-1.497-1.784-1.672-2.084-.175-.3-.019-.462.13-.61.136-.134.301-.35.452-.525.15-.175.2-.3.3-.5.1-.2.05-.375-.025-.525-.075-.15-.677-1.636-.928-2.237-.245-.584-.495-.505-.678-.514-.175-.008-.376-.01-.576-.01-.2 0-.525.075-.8.375-.275.3-1.05 1.026-1.05 2.502 0 1.476 1.075 2.898 1.225 3.1 0 .175 2.112 3.226 5.118 4.523.715.31 1.273.495 1.708.634.717.228 1.37.196 1.886.119.576-.086 1.78-.727 2.03-1.428.25-.701.25-1.302.175-1.428-.075-.125-.275-.2-.576-.35zm-5.467 7.618h-.008a9.98 9.98 0 01-5.084-1.39l-.365-.216-3.78.99.101-3.687-.237-.377a9.99 9.99 0 01-1.536-5.385c0-5.518 4.49-10.008 10.012-10.008 2.673 0 5.184 1.042 7.072 2.93 1.888 1.888 2.928 4.4 2.927 7.074 0 5.52-4.49 10.007-10.01 10.007z"/></svg>
-              WhatsApp
-            </button>
+            ${o.status === 'new' ? `<button class="btn-ready" onclick="setOrderStatus('${o.id}', 'ready')">✓ Mark Ready</button>` : ''}
+            ${o.status === 'ready' ? `<button class="btn-done" onclick="setOrderStatus('${o.id}', 'done')">📦 Collected</button>` : ''}
+            <button class="btn-wa" onclick='notifyCustomer(${JSON.stringify(o).replace(/'/g, "&apos;")})'>💬 WhatsApp Customer</button>
           </div>
         </div>
       `;
@@ -1137,11 +1090,11 @@
   function notifyCustomer(order) {
     var msg;
     if (order.status === 'ready') {
-      msg = `Hi ${order.customer_name}! Your order *#${order.order_number}* at eKasi Kota Hub is READY for pickup!`;
+      msg = `Hi ${order.customer_name}! 👋 Your order *#${order.order_number}* at eKasi Kota Hub is READY for pickup! 🔥`;
     } else if (order.status === 'done') {
-      msg = `Hi ${order.customer_name}! Thanks for your order *#${order.order_number}* at eKasi Kota Hub. Enjoy!`;
+      msg = `Hi ${order.customer_name}! Thanks for your order *#${order.order_number}* at eKasi Kota Hub. Enjoy! 🙏`;
     } else {
-      msg = `Hi ${order.customer_name}! Update on your order *#${order.order_number}* at eKasi Kota Hub:`;
+      msg = `Hi ${order.customer_name}! 👋 Update on your order *#${order.order_number}* at eKasi Kota Hub:`;
     }
     var phone = String(order.customer_phone || '').replace(/[^0-9]/g, '');
     if (phone.startsWith('0')) phone = '27' + phone.slice(1);
@@ -1194,11 +1147,11 @@
           <div class="edit-item-top">
             <label class="edit-photo-box ${hasPhoto ? 'has-photo' : ''}" data-id="${item.id}"
                    style="${hasPhoto ? `background-image:url('${item.photo_url}')` : ''}"
-                   title="Tap to upload photo">
+                   title="Tap to upload or take a photo">
               ${hasPhoto ? '' : (item.emoji || '📷')}
               <input type="file" accept="image/*" capture="environment"
                      onchange="handlePhotoUpload('${item.id}', this)" />
-              <div class="photo-hint">${hasPhoto ? 'Change' : 'Add Photo'}</div>
+              <div class="photo-hint">${hasPhoto ? 'Change' : '📷 Add Photo'}</div>
               ${hasPhoto ? `<button class="photo-remove-btn" onclick="removePhoto('${item.id}', event)" title="Remove photo">✕</button>` : ''}
             </label>
             <div class="edit-fields">
@@ -1209,7 +1162,7 @@
               <input type="text" value="${escapeHtml(item.emoji||'')}"
                      onchange="updateMenuField('${item.id}', 'emoji', this.value)"
                      placeholder="Backup emoji (shown if no photo)"
-                     style="font-size:16px;" />
+                     style="font-size:18px;" />
             </div>
           </div>
           <div class="edit-bottom">
@@ -1221,9 +1174,7 @@
             <div class="edit-bottom-right">
               <span class="avail-label">${item.available ? 'Available' : 'Sold Out'}</span>
               <div class="toggle ${item.available ? 'on' : ''}" onclick="toggleAvailable('${item.id}', ${item.available})"></div>
-              <button class="delete-btn" onclick="deleteMenuItem('${item.id}')">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
-              </button>
+              <button class="delete-btn" onclick="deleteMenuItem('${item.id}')">🗑</button>
             </div>
           </div>
         </div>
@@ -1280,7 +1231,7 @@
     if (!file.type.startsWith('image/')) { alert('Please choose an image file'); return; }
     try {
       var box = document.querySelector(`.edit-photo-box[data-id="${itemId}"]`);
-      if (box) box.innerHTML = '<div style="font-size:12px; color:#666;">⏳ Loading...</div>';
+      if (box) box.innerHTML = '<div style="font-size:14px; color:#666;">⏳ Loading...</div>';
       var dataUrl = await compressImage(file, 600, 0.7);
       await db.collection('menu_items').doc(itemId).update({ photo_url: dataUrl });
     } catch (e) {
