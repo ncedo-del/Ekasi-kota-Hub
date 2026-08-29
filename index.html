@@ -1179,20 +1179,29 @@
   }
 
   function updateMenuField(id, field, value) {
-    db.collection('menu_items').doc(id).update({ [field]: value });
+    db.collection('menu_items').doc(id).update({ [field]: value })
+      .catch(function(err) { alert('Could not save change: ' + err.message); });
   }
   function toggleAvailable(id, current) {
-    db.collection('menu_items').doc(id).update({ available: !current });
+    db.collection('menu_items').doc(id).update({ available: !current })
+      .catch(function(err) { alert('Could not update item: ' + err.message); });
   }
   function deleteMenuItem(id) {
     if (!confirm('Delete this item?')) return;
-    db.collection('menu_items').doc(id).delete();
+    db.collection('menu_items').doc(id).delete()
+      .catch(function(err) { alert('Could not delete item: ' + err.message); });
   }
   function addMenuItem() {
+    if (!auth.currentUser || auth.currentUser.uid !== OWNER_ID) {
+      alert('Could not add item: your logged-in account UID does not match OWNER_ID in the config. Check Firebase Console → Authentication → Users and make sure OWNER_ID matches the UID you are logged in as.');
+      return;
+    }
     db.collection('menu_items').add({
       owner_id: OWNER_ID, name: 'New Item', description: '', emoji: '🍽️',
       price_cents: 0, available: true, sort_order: menu.length,
       created_at: firebase.firestore.FieldValue.serverTimestamp()
+    }).catch(function(err) {
+      alert('Could not add item: ' + err.message);
     });
   }
 
@@ -1263,13 +1272,13 @@
       wait_time_minutes: wait_time_minutes,
       phone: phone,
       pay_instructions: pay_instructions
-    }, { merge: true });
+    }, { merge: true }).catch(function(err) { alert('Could not save settings: ' + err.message); });
   }
 
   function toggleShopOpen() {
     db.collection('owners').doc(OWNER_ID).set({
       shop_open: !shopInfo.shop_open
-    }, { merge: true });
+    }, { merge: true }).catch(function(err) { alert('Could not update shop status: ' + err.message); });
   }
 </script>
 </body>
