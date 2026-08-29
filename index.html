@@ -647,6 +647,7 @@
       if (doc.exists) {
         shopInfo = doc.data();
         updateStatusBar();
+        if (isOwnerLoggedIn) populateSettingsForm();
       }
     });
   }
@@ -1031,6 +1032,10 @@
       document.getElementById('tabContent' + t.charAt(0).toUpperCase()+t.slice(1)).style.display = (t === tab) ? '' : 'none';
       document.getElementById('tab' + t.charAt(0).toUpperCase()+t.slice(1)).classList.toggle('active', t === tab);
     });
+    // Re-render from whatever's already loaded — never relies on a
+    // separate fetch finishing in time.
+    if (tab === 'menu') renderOwnerMenu();
+    if (tab === 'settings') populateSettingsForm();
   }
 
   function subscribeToOrders() {
@@ -1278,17 +1283,18 @@
   }
 
   // SETTINGS
+  // Populates the Settings form from the already-live `shopInfo` object
+  // (kept up to date in the background by listenToShopInfo() since the
+  // page loaded) — no separate fetch, so no race with the tab switch.
+  function populateSettingsForm() {
+    document.getElementById('waitTimeInput').value = shopInfo.wait_time_minutes || 15;
+    document.getElementById('ownerPhone').value = shopInfo.phone || '';
+    document.getElementById('payInstructions').value = shopInfo.pay_instructions || '';
+    document.getElementById('shopOpenToggle').classList.toggle('on', !!shopInfo.shop_open);
+    document.getElementById('shopOpenLabel').textContent = shopInfo.shop_open ? 'Open' : 'Closed';
+  }
   function loadSettingsToForm() {
-    db.collection('owners').doc(OWNER_ID).get().then(function(doc) {
-      if (!doc.exists) return;
-      shopInfo = doc.data();
-      document.getElementById('waitTimeInput').value = shopInfo.wait_time_minutes || 15;
-      document.getElementById('ownerPhone').value = shopInfo.phone || '';
-      document.getElementById('payInstructions').value = shopInfo.pay_instructions || '';
-      document.getElementById('shopOpenToggle').classList.toggle('on', !!shopInfo.shop_open);
-      document.getElementById('shopOpenLabel').textContent = shopInfo.shop_open ? 'Open' : 'Closed';
-      updateStatusBar();
-    });
+    populateSettingsForm();
   }
 
   function saveSettings() {
