@@ -380,6 +380,8 @@
     border-radius: 10px; font-size: 13px; color: var(--oxblood-deep); margin-bottom: 12px; font-weight: 600;
   }
   hr { border: none; border-top: 2px dashed var(--border); margin: 16px 0; }
+  .icon { display: inline-block; vertical-align: -3px; margin-right: 5px; }
+  .icon-lg { display: inline-block; vertical-align: -6px; width: 22px; height: 22px; }
 
   @media (min-width: 700px) {
     body { padding-bottom: 20px; }
@@ -409,7 +411,7 @@
   </div>
   <div class="status-bar">
     <span id="shopStatus" class="status-open">● OPEN — Taking Orders</span>
-    <span id="waitInfo">⏱ ~15 min wait</span>
+    <span id="waitInfo"><svg class="icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>~15 min wait</span>
   </div>
 </header>
 
@@ -428,7 +430,7 @@
 <div class="modal" id="cartModal">
   <div class="modal-content">
     <div class="modal-header">
-      <h2>🛒 Your Order</h2>
+      <h2><svg class="icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="20" r="1.5"/><circle cx="17" cy="20" r="1.5"/><path d="M3 4h2l2.4 12.2a2 2 0 0 0 2 1.8h7.2a2 2 0 0 0 2-1.6L21 8H6"/></svg>Your Order</h2>
       <button class="close-btn" onclick="closeModal('cartModal')">✕</button>
     </div>
     <div id="cartErrorBanner"></div>
@@ -451,11 +453,11 @@
     <div class="payment-options">
       <label>
         <input type="radio" name="payment" value="cash" checked />
-        <span>💵 Cash on Pickup</span>
+        <span><svg class="icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="10" rx="2"/><circle cx="12" cy="12" r="2"/></svg>Cash on Pickup</span>
       </label>
       <label>
         <input type="radio" name="payment" value="online" />
-        <span>📱 Pay Online</span>
+        <span><svg class="icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M3 10h18"/></svg>Pay Online</span>
       </label>
     </div>
 
@@ -467,11 +469,11 @@
 <div class="modal" id="confirmModal">
   <div class="modal-content">
     <div class="order-confirm">
-      <div class="check">✓</div>
+      <div class="check"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg></div>
       <h2 style="border:none; padding:0;">Order Placed!</h2>
       <p style="color: var(--muted); margin-top: 6px;">Show this number when you collect</p>
       <div class="order-number" id="orderNumberDisplay">#000</div>
-      <div class="wait-time" id="waitTimeDisplay">⏱ Ready in ~15 minutes</div>
+      <div class="wait-time" id="waitTimeDisplay"><svg class="icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>Ready in ~15 minutes</div>
       <div class="order-summary" id="orderSummaryDisplay"></div>
       <div id="paymentInstructions"></div>
       <button class="submit-btn" style="background: var(--red);" onclick="closeModal('confirmModal'); resetCart();">Done</button>
@@ -483,13 +485,14 @@
 <div class="modal" id="loginModal">
   <div class="modal-content">
     <div class="modal-header">
-      <h2>🔒 Owner Login</h2>
+      <h2><svg class="icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>Owner Login</h2>
       <button class="close-btn" onclick="closeModal('loginModal')">✕</button>
     </div>
-    <p style="color: var(--muted); font-size: 14px;">We'll email you a secure login link — no password to remember.</p>
     <label>Your email</label>
     <input type="email" id="ownerEmailInput" placeholder="owner@example.com" />
-    <button class="submit-btn" onclick="sendMagicLink()">Send Login Link</button>
+    <label>Password</label>
+    <input type="password" id="ownerPasswordInput" placeholder="••••••••" />
+    <button class="submit-btn" onclick="ownerPasswordLogin()">Log In</button>
     <div id="loginStatusMsg" style="font-size:13px; color:var(--muted); margin-top:10px; text-align:center;"></div>
   </div>
 </div>
@@ -498,23 +501,23 @@
 <div class="modal" id="ownerModal">
   <div class="modal-content">
     <div class="modal-header">
-      <h2>👨‍🍳 Owner Dashboard</h2>
+      <h2><svg class="icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a4 4 0 0 0-4 4c0 .34.04.67.1 1A5 5 0 0 0 4 12c0 1.5.7 2.8 1.8 3.7L6 20h12l.2-4.3C19.3 14.8 20 13.5 20 12a5 5 0 0 0-4.1-4.9c.06-.33.1-.66.1-1a4 4 0 0 0-4-4z"/></svg>Owner Dashboard</h2>
       <button class="close-btn" onclick="closeModal('ownerModal')">✕</button>
     </div>
     <div class="tab-bar">
-      <button id="tabOrders" class="active" onclick="switchTab('orders')">📋 Orders <span id="newOrderBadge" style="display:none; background:var(--red); color:white; border-radius:10px; padding:2px 6px; font-size:11px;">0</span></button>
-      <button id="tabMenu" onclick="switchTab('menu')">🍔 Menu</button>
-      <button id="tabSettings" onclick="switchTab('settings')">⚙️ Settings</button>
+      <button id="tabOrders" class="active" onclick="switchTab('orders')"><svg class="icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="12" height="16" rx="2"/><path d="M9 4V3a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v1"/><path d="M9 10h6M9 14h6"/></svg>Orders <span id="newOrderBadge" style="display:none; background:var(--red); color:white; border-radius:10px; padding:2px 6px; font-size:11px;">0</span></button>
+      <button id="tabMenu" onclick="switchTab('menu')"><svg class="icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2v6a2 2 0 0 0 4 0V2M8 8v14"/><path d="M17 2c-2 3-2 6 0 8v12"/></svg>Menu</button>
+      <button id="tabSettings" onclick="switchTab('settings')"><svg class="icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v2M12 20v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M2 12h2M20 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4"/></svg>Settings</button>
     </div>
 
     <div id="tabContentOrders">
-      <div class="info-banner">📲 Keep this page open to get sound alerts for new orders — works across devices now.</div>
+      <div class="info-banner"><svg class="icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 5 2 6 2 6H4s2-1 2-6"/><path d="M10 21a2 2 0 0 0 4 0"/></svg>Keep this page open to get sound alerts for new orders — works across devices now.</div>
       <div id="ownerOrdersList"></div>
     </div>
 
     <div id="tabContentMenu" style="display:none;">
       <div class="info-banner">
-        ✏️ Edit prices, names, descriptions. Tap the <b>photo box</b> to upload or take a photo of each item. Toggle to mark <b>SOLD OUT</b>.
+        <svg class="icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>Edit prices, names, descriptions. Tap the <b>photo box</b> to upload or take a photo of each item. Toggle to mark <b>SOLD OUT</b>.
       </div>
       <div id="ownerMenuList"></div>
       <button class="add-item-btn" onclick="addMenuItem()">+ Add New Item</button>
@@ -522,7 +525,7 @@
 
     <div id="tabContentSettings" style="display:none;">
       <div class="settings-card">
-        <h3>🏪 Shop Status</h3>
+        <h3><svg class="icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l1-5h16l1 5M4 9v10a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1V9M4 9h16M9 21v-6h6v6"/></svg>Shop Status</h3>
         <label>Are you taking orders?</label>
         <div style="display:flex; gap:10px; align-items:center; margin-top:8px;">
           <div class="toggle" id="shopOpenToggle" onclick="toggleShopOpen()"></div>
@@ -531,47 +534,47 @@
       </div>
 
       <div class="settings-card">
-        <h3>⏱ Estimated Waiting Time</h3>
+        <h3><svg class="icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>Estimated Waiting Time</h3>
         <label>Minutes until order is ready</label>
         <input type="number" id="waitTimeInput" min="1" max="120" onchange="saveSettings()" />
       </div>
 
       <div class="settings-card">
-        <h3>📱 Your WhatsApp Number</h3>
+        <h3><svg class="icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h3l1.5 4.5-2 1.5a12 12 0 0 0 6 6l1.5-2L20 15v3a2 2 0 0 1-2 2A16 16 0 0 1 4 6a2 2 0 0 1 2-3z"/></svg>Your WhatsApp Number</h3>
         <label>Order notifications will be sent here</label>
         <input type="tel" id="ownerPhone" placeholder="e.g. 27821234567 (no + or spaces)" onchange="saveSettings()" />
         <p style="font-size: 11px; color: var(--muted); margin-top: 6px;">Use country code (27 for SA) — e.g. <b>27821234567</b></p>
       </div>
 
       <div class="settings-card">
-        <h3>💳 Online Payment Info</h3>
+        <h3><svg class="icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M3 10h18"/></svg>Online Payment Info</h3>
         <label>Payment instructions shown to customer (e.g. EFT, SnapScan link)</label>
         <textarea id="payInstructions" rows="3" placeholder="e.g. SnapScan: https://pos.snapscan.io/qr/XXXXX&#10;OR EFT: FNB 1234567890 — use order # as reference" onchange="saveSettings()"></textarea>
       </div>
 
       <div class="settings-card">
-        <h3>🔐 Account</h3>
+        <h3><svg class="icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>Account</h3>
         <p style="font-size: 13px; color: var(--muted);" id="accountEmailDisplay">Logged in</p>
       </div>
 
       <hr>
-      <button class="delete-btn" style="width:100%; padding:12px;" onclick="if(confirm('Clear all completed orders?')) clearDoneOrders()">🗑 Clear Completed Orders</button>
-      <button class="delete-btn" style="width:100%; padding:12px; margin-top:8px; background:#555;" onclick="logoutOwner()">🚪 Logout</button>
+      <button class="delete-btn" style="width:100%; padding:12px;" onclick="if(confirm('Clear all completed orders?')) clearDoneOrders()"><svg class="icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v3M6 7l1 13a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-13"/></svg>Clear Completed Orders</button>
+      <button class="delete-btn" style="width:100%; padding:12px; margin-top:8px; background:#555;" onclick="logoutOwner()"><svg class="icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>Logout</button>
     </div>
   </div>
 </div>
 
 <script>
-// CONFIG — eKasi Kota Hub Firebase Project
-var FIREBASE_CONFIG = {
-  apiKey: "AIzaSyDwhUz_oJG-2uDIG1yYoP49L6OIJIAxk2U",
-  authDomain: "ekasi-kota-hub-prod.firebaseapp.com",
-  projectId: "ekasi-kota-hub-prod",
-  storageBucket: "ekasi-kota-hub-prod.firebasestorage.app",
-  messagingSenderId: "423241803895",
-  appId: "1:423241803895:web:606910efee8a089056fe72"
-};
-var OWNER_ID = lV8QuIFNHBWIZFZZWfa1jEsiraH3; // Firebase Auth UID for the shop owner
+  // CONFIG — eKasi Kota Hub Firebase Project
+  var FIREBASE_CONFIG = {
+    apiKey: "AIzaSyDwhUz_oJG-2uDIG1yYoP49L6OIJIAxk2U",
+    authDomain: "ekasi-kota-hub-prod.firebaseapp.com",
+    projectId: "ekasi-kota-hub-prod",
+    storageBucket: "ekasi-kota-hub-prod.firebasestorage.app",
+    messagingSenderId: "423241803895",
+    appId: "1:423241803895:web:606910efee8a089056fe72"
+  };
+  var OWNER_ID = 'lV8QuIFNHBWIZFZZWfa1jEsiraH3'; // Firebase Auth UID for the shop owner
 
   // Initialize Firebase
   firebase.initializeApp(FIREBASE_CONFIG);
@@ -584,6 +587,22 @@ var OWNER_ID = lV8QuIFNHBWIZFZZWfa1jEsiraH3; // Firebase Auth UID for the shop o
   // and paste its /exec URL here. Leave blank to skip and rely on the
   // in-dashboard ding + badge instead.
   var WHATSAPP_RELAY_URL = '';
+
+  var ICONS = {
+    warning: '<svg class="icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 2 21h20L12 3z"/><path d="M12 10v4M12 17h.01"/></svg>',
+    clock: '<svg class="icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>',
+    cash: '<svg class="icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="10" rx="2"/><circle cx="12" cy="12" r="2"/></svg>',
+    card: '<svg class="icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M3 10h18"/></svg>',
+    phone: '<svg class="icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h3l1.5 4.5-2 1.5a12 12 0 0 0 6 6l1.5-2L20 15v3a2 2 0 0 1-2 2A16 16 0 0 1 4 6a2 2 0 0 1 2-3z"/></svg>',
+    check: '<svg class="icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg>',
+    package: '<svg class="icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8l-9-5-9 5 9 5 9-5z"/><path d="M3 8v9l9 5 9-5V8M12 13v9"/></svg>',
+    message: '<svg class="icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.5 8.5 0 0 1-8.5 8.5c-1.4 0-2.7-.3-3.9-.9L3 21l1.9-5.6A8.4 8.4 0 0 1 3.5 11.5 8.5 8.5 0 0 1 12 3a8.5 8.5 0 0 1 9 8.5z"/></svg>',
+    note: '<svg class="icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4V4z"/><path d="M8 9h8M8 13h5"/></svg>',
+    camera: '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7l1.5-3h5L16 7"/><circle cx="12" cy="13" r="3.5"/></svg>',
+    trash: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v3M6 7l1 13a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-13"/></svg>',
+    inbox: '<svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l2 3h6l2-3h4"/><path d="M5 12 3 6a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2l-2 6"/><path d="M3 12v6a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-6"/></svg>',
+    plate: '<svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/></svg>'
+  };
 
   // STATE
   var menu = [];
@@ -610,23 +629,6 @@ var OWNER_ID = lV8QuIFNHBWIZFZZWfa1jEsiraH3; // Firebase Auth UID for the shop o
       }
     });
 
-    // Check for email link sign-in completion
-    if (auth.isSignInWithEmailLink(window.location.href)) {
-      var email = window.localStorage.getItem('emailForSignIn');
-      if (!email) {
-        email = window.prompt('Please provide your email for confirmation');
-      }
-      if (email) {
-        auth.signInWithEmailLink(email, window.location.href)
-          .then(function() {
-            window.localStorage.removeItem('emailForSignIn');
-          })
-          .catch(function(err) {
-            alert('Could not sign in: ' + err.message);
-          });
-      }
-    }
-
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('sw.js').catch(function() {});
     }
@@ -645,7 +647,7 @@ var OWNER_ID = lV8QuIFNHBWIZFZZWfa1jEsiraH3; // Firebase Auth UID for the shop o
   function updateStatusBar() {
     document.getElementById('shopStatus').textContent = shopInfo.shop_open ? '● OPEN — Taking Orders' : '● CLOSED — Not taking orders';
     document.getElementById('shopStatus').className = shopInfo.shop_open ? 'status-open' : 'status-closed';
-    document.getElementById('waitInfo').textContent = '⏱ ~' + (shopInfo.wait_time_minutes || 15) + ' min wait';
+    document.getElementById('waitInfo').innerHTML = ICONS.clock + '~' + (shopInfo.wait_time_minutes || 15) + ' min wait';
   }
 
   // MENU (customer + owner)
@@ -669,11 +671,11 @@ var OWNER_ID = lV8QuIFNHBWIZFZZWfa1jEsiraH3; // Firebase Auth UID for the shop o
   function renderMenu() {
     var container = document.getElementById('menuContainer');
     if (menu.length === 0) {
-      container.innerHTML = '<div class="empty-state">😔 No items available right now. Please check back soon!</div>';
+      container.innerHTML = '<div class="empty-state">' + ICONS.plate + '<br>No items available right now. Please check back soon!</div>';
       updateCartBar();
       return;
     }
-    var html = '<h2>🔥 Our Menu</h2>';
+    var html = '<h2><svg class="icon" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2v6a2 2 0 0 0 4 0V2M8 8v14"/><path d="M17 2c-2 3-2 6 0 8v12"/></svg>Our Menu</h2>';
     menu.forEach(function(item) {
       var inCart = cart.find(function(c) { return c.id === item.id; });
       var qty = inCart ? inCart.qty : 0;
@@ -799,11 +801,11 @@ var OWNER_ID = lV8QuIFNHBWIZFZZWfa1jEsiraH3; // Firebase Auth UID for the shop o
 
     var phone = phoneRaw.replace(/\D/g, '');
     if (!/^[0-9]{9,15}$/.test(phone)) {
-      errorBanner.innerHTML = '<div class="error-banner">⚠️ Please enter a valid phone number.</div>';
+      errorBanner.innerHTML = '<div class="error-banner">' + ICONS.warning + 'Please enter a valid phone number.</div>';
       return;
     }
     if (!shopInfo || !shopInfo.shop_open) {
-      errorBanner.innerHTML = '<div class="error-banner">⚠️ Sorry, the shop is currently closed.</div>';
+      errorBanner.innerHTML = '<div class="error-banner">' + ICONS.warning + 'Sorry, the shop is currently closed.</div>';
       return;
     }
 
@@ -816,16 +818,16 @@ var OWNER_ID = lV8QuIFNHBWIZFZZWfa1jEsiraH3; // Firebase Auth UID for the shop o
       var cartLine = cart[i];
       var liveItem = menu.find(function(m) { return m.id === cartLine.id; });
       if (!liveItem) {
-        errorBanner.innerHTML = '<div class="error-banner">⚠️ An item in your cart no longer exists. Please review your order.</div>';
+        errorBanner.innerHTML = '<div class="error-banner">' + ICONS.warning + 'An item in your cart no longer exists. Please review your order.</div>';
         return;
       }
       if (!liveItem.available) {
-        errorBanner.innerHTML = '<div class="error-banner">⚠️ ' + escapeHtml(liveItem.name) + ' just sold out. Please remove it.</div>';
+        errorBanner.innerHTML = '<div class="error-banner">' + ICONS.warning + escapeHtml(liveItem.name) + ' just sold out. Please remove it.</div>';
         return;
       }
       var qty = parseInt(cartLine.qty, 10);
       if (!Number.isInteger(qty) || qty <= 0 || qty > 50) {
-        errorBanner.innerHTML = '<div class="error-banner">⚠️ Invalid quantity.</div>';
+        errorBanner.innerHTML = '<div class="error-banner">' + ICONS.warning + 'Invalid quantity.</div>';
         return;
       }
       var lineTotal = (liveItem.price_cents || 0) * qty;
@@ -905,19 +907,19 @@ var OWNER_ID = lV8QuIFNHBWIZFZZWfa1jEsiraH3; // Firebase Auth UID for the shop o
       btn.textContent = 'Place Order';
 
       document.getElementById('orderNumberDisplay').textContent = '#' + orderNumber;
-      document.getElementById('waitTimeDisplay').textContent = '⏱ Ready in ~' + waitMinutes + ' minutes';
+      document.getElementById('waitTimeDisplay').innerHTML = ICONS.clock + 'Ready in ~' + waitMinutes + ' minutes';
       var summary = '<b>Your Order:</b><br>';
       orderItemRows.forEach(function(i) {
         summary += i.qty + '× ' + escapeHtml(i.name) + ' — R' + ((i.qty * i.price_cents) / 100).toFixed(0) + '<br>';
       });
-      summary += '<br><b>Total: R' + (total_cents / 100).toFixed(0) + '</b><br>Payment: ' + (payment === 'cash' ? '💵 Cash on Pickup' : '📱 Online Payment');
+      summary += '<br><b>Total: R' + (total_cents / 100).toFixed(0) + '</b><br>Payment: ' + (payment === 'cash' ? (ICONS.cash + 'Cash on Pickup') : (ICONS.phone + 'Online Payment'));
       document.getElementById('orderSummaryDisplay').innerHTML = summary;
 
       var payDiv = document.getElementById('paymentInstructions');
       if (payment === 'online' && shopInfo.pay_instructions) {
-        payDiv.innerHTML = '<div class="info-banner" style="text-align:left;"><b>💳 Payment Instructions:</b><br>' + escapeHtml(shopInfo.pay_instructions).replace(/\n/g, '<br>') + '</div>';
+        payDiv.innerHTML = '<div class="info-banner" style="text-align:left;"><b>' + ICONS.card + 'Payment Instructions:</b><br>' + escapeHtml(shopInfo.pay_instructions).replace(/\n/g, '<br>') + '</div>';
       } else if (payment === 'cash') {
-        payDiv.innerHTML = '<div class="info-banner">💵 Please bring <b>R' + (total_cents / 100).toFixed(0) + '</b> when you collect.</div>';
+        payDiv.innerHTML = '<div class="info-banner">' + ICONS.cash + 'Please bring <b>R' + (total_cents / 100).toFixed(0) + '</b> when you collect.</div>';
       } else {
         payDiv.innerHTML = '';
       }
@@ -928,7 +930,7 @@ var OWNER_ID = lV8QuIFNHBWIZFZZWfa1jEsiraH3; // Firebase Auth UID for the shop o
       btn.disabled = false;
       btn.textContent = 'Place Order';
       var msg = err.message || 'Something went wrong placing your order. Please try again.';
-      errorBanner.innerHTML = '<div class="error-banner">⚠️ ' + escapeHtml(msg) + '</div>';
+      errorBanner.innerHTML = '<div class="error-banner">' + ICONS.warning + escapeHtml(msg) + '</div>';
     }
   }
 
@@ -965,7 +967,7 @@ var OWNER_ID = lV8QuIFNHBWIZFZZWfa1jEsiraH3; // Firebase Auth UID for the shop o
 
   function closeModal(id) { document.getElementById(id).classList.remove('show'); }
 
-  // OWNER LOGIN (Firebase Auth Email Link)
+  // OWNER LOGIN (Firebase Auth Email/Password)
   function openOwner() {
     if (isOwnerLoggedIn) {
       openOwnerDashboard();
@@ -975,25 +977,19 @@ var OWNER_ID = lV8QuIFNHBWIZFZZWfa1jEsiraH3; // Firebase Auth UID for the shop o
     }
   }
 
-  function sendMagicLink() {
+  function ownerPasswordLogin() {
     var email = document.getElementById('ownerEmailInput').value.trim();
+    var password = document.getElementById('ownerPasswordInput').value;
     var statusEl = document.getElementById('loginStatusMsg');
-    if (!email) { statusEl.textContent = 'Enter your email first.'; return; }
-    statusEl.textContent = 'Sending…';
+    if (!email || !password) { statusEl.textContent = 'Enter your email and password.'; return; }
+    statusEl.textContent = 'Logging in…';
 
-    var actionCodeSettings = {
-      url: window.location.href,
-      handleCodeInApp: true
-    };
-
-    auth.sendSignInLinkToEmail(email, actionCodeSettings)
-      .then(function() {
-        window.localStorage.setItem('emailForSignIn', email);
-        statusEl.textContent = '✓ Check your email for the login link.';
-      })
+    auth.signInWithEmailAndPassword(email, password)
       .catch(function(error) {
         statusEl.textContent = 'Error: ' + error.message;
       });
+    // onAuthStateChanged (already wired below) closes the modal and
+    // opens the dashboard automatically on success.
   }
 
   function logoutOwner() {
@@ -1049,7 +1045,7 @@ var OWNER_ID = lV8QuIFNHBWIZFZZWfa1jEsiraH3; // Firebase Auth UID for the shop o
   function renderOwnerOrdersList(orders) {
     var list = document.getElementById('ownerOrdersList');
     if (!orders || orders.length === 0) {
-      list.innerHTML = '<div class="empty-state">📭 No orders yet</div>';
+      list.innerHTML = '<div class="empty-state">' + ICONS.inbox + '<br>No orders yet</div>';
       updateNewOrderBadge([]);
       return;
     }
@@ -1066,14 +1062,14 @@ var OWNER_ID = lV8QuIFNHBWIZFZZWfa1jEsiraH3; // Firebase Auth UID for the shop o
             <span class="order-num-badge">#${o.order_number}</span>
             <span class="order-time">${time} • ${date}</span>
           </div>
-          <div><b>${escapeHtml(o.customer_name)}</b> — 📱 ${escapeHtml(o.customer_phone)}</div>
+          <div><b>${escapeHtml(o.customer_name)}</b> — ${ICONS.phone}${escapeHtml(o.customer_phone)}</div>
           <div style="font-size:13px; margin-top:4px;">${itemsHtml}</div>
-          ${o.notes ? `<div style="font-size:12px; color:var(--muted); margin-top:4px;">📝 ${escapeHtml(o.notes)}</div>` : ''}
-          <div style="margin-top:6px;"><b>R${((o.total_cents || 0) / 100).toFixed(0)}</b> • ${o.payment_method === 'cash' ? '💵 Cash' : '📱 Online'} • Status: <b>${String(o.status || '').toUpperCase()}</b></div>
+          ${o.notes ? `<div style="font-size:12px; color:var(--muted); margin-top:4px;">${ICONS.note}${escapeHtml(o.notes)}</div>` : ''}
+          <div style="margin-top:6px;"><b>R${((o.total_cents || 0) / 100).toFixed(0)}</b> • ${o.payment_method === 'cash' ? (ICONS.cash + 'Cash') : (ICONS.phone + 'Online')} • Status: <b>${String(o.status || '').toUpperCase()}</b></div>
           <div class="order-actions">
-            ${o.status === 'new' ? `<button class="btn-ready" onclick="setOrderStatus('${o.id}', 'ready')">✓ Mark Ready</button>` : ''}
-            ${o.status === 'ready' ? `<button class="btn-done" onclick="setOrderStatus('${o.id}', 'done')">📦 Collected</button>` : ''}
-            <button class="btn-wa" onclick='notifyCustomer(${JSON.stringify(o).replace(/'/g, "&apos;")})'>💬 WhatsApp Customer</button>
+            ${o.status === 'new' ? `<button class="btn-ready" onclick="setOrderStatus('${o.id}', 'ready')">${ICONS.check}Mark Ready</button>` : ''}
+            ${o.status === 'ready' ? `<button class="btn-done" onclick="setOrderStatus('${o.id}', 'done')">${ICONS.package}Collected</button>` : ''}
+            <button class="btn-wa" onclick='notifyCustomer(${JSON.stringify(o).replace(/'/g, "&apos;")})'>${ICONS.message}WhatsApp Customer</button>
           </div>
         </div>
       `;
@@ -1147,10 +1143,10 @@ var OWNER_ID = lV8QuIFNHBWIZFZZWfa1jEsiraH3; // Firebase Auth UID for the shop o
             <label class="edit-photo-box ${hasPhoto ? 'has-photo' : ''}" data-id="${item.id}"
                    style="${hasPhoto ? `background-image:url('${item.photo_url}')` : ''}"
                    title="Tap to upload or take a photo">
-              ${hasPhoto ? '' : (item.emoji || '📷')}
+              ${hasPhoto ? '' : (item.emoji || ICONS.camera)}
               <input type="file" accept="image/*" capture="environment"
                      onchange="handlePhotoUpload('${item.id}', this)" />
-              <div class="photo-hint">${hasPhoto ? 'Change' : '📷 Add Photo'}</div>
+              <div class="photo-hint">${hasPhoto ? 'Change' : 'Add Photo'}</div>
               ${hasPhoto ? `<button class="photo-remove-btn" onclick="removePhoto('${item.id}', event)" title="Remove photo">✕</button>` : ''}
             </label>
             <div class="edit-fields">
@@ -1173,7 +1169,7 @@ var OWNER_ID = lV8QuIFNHBWIZFZZWfa1jEsiraH3; // Firebase Auth UID for the shop o
             <div class="edit-bottom-right">
               <span class="avail-label">${item.available ? 'Available' : 'Sold Out'}</span>
               <div class="toggle ${item.available ? 'on' : ''}" onclick="toggleAvailable('${item.id}', ${item.available})"></div>
-              <button class="delete-btn" onclick="deleteMenuItem('${item.id}')">🗑</button>
+              <button class="delete-btn" onclick="deleteMenuItem('${item.id}')">${ICONS.trash}</button>
             </div>
           </div>
         </div>
@@ -1230,7 +1226,7 @@ var OWNER_ID = lV8QuIFNHBWIZFZZWfa1jEsiraH3; // Firebase Auth UID for the shop o
     if (!file.type.startsWith('image/')) { alert('Please choose an image file'); return; }
     try {
       var box = document.querySelector(`.edit-photo-box[data-id="${itemId}"]`);
-      if (box) box.innerHTML = '<div style="font-size:14px; color:#666;">⏳ Loading...</div>';
+      if (box) box.innerHTML = '<div style="font-size:14px; color:#666;">' + ICONS.clock + 'Loading...</div>';
       var dataUrl = await compressImage(file, 600, 0.7);
       await db.collection('menu_items').doc(itemId).update({ photo_url: dataUrl });
     } catch (e) {
