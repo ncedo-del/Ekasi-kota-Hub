@@ -109,6 +109,13 @@
     color: var(--oxblood); border-left: 6px solid var(--mustard);
     padding-left: 12px; text-transform: uppercase; letter-spacing: .5px;
   }
+  .category-header {
+    font-size: 16px; margin: 24px 0 10px;
+    color: var(--oxblood-deep); border-left: 4px solid var(--chili);
+    padding-left: 10px; text-transform: uppercase; letter-spacing: .5px;
+    font-weight: 800;
+  }
+  .category-header:first-of-type { margin-top: 4px; }
   .menu-item {
     background: var(--card); border-radius: 16px;
     margin-bottom: 18px; overflow: hidden;
@@ -564,7 +571,7 @@
       </div>
 
       <hr>
-      <button class="delete-btn" style="width:100%; padding:12px;" onclick="if(confirm('Clear all completed orders?')) clearDoneOrders()"><svg class="icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v3M6 7l1 13a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-13"/></svg>Clear Completed Orders</button>
+      <button class="delete-btn" style="width:100%; padding:12px;" onclick="if(confirm('Clear all completed orders?')) clearDoneOrders(this)"><svg class="icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v3M6 7l1 13a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-13"/></svg>Clear Completed Orders</button>
       <button class="delete-btn" style="width:100%; padding:12px; margin-top:8px; background:#555;" onclick="logoutOwner()"><svg class="icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>Logout</button>
     </div>
   </div>
@@ -685,6 +692,17 @@
       });
   }
 
+  function groupByCategory(items) {
+    var groups = {};
+    var order = [];
+    items.forEach(function(item) {
+      var cat = (item.category || '').trim() || 'Other';
+      if (!groups[cat]) { groups[cat] = []; order.push(cat); }
+      groups[cat].push(item);
+    });
+    return { groups: groups, order: order };
+  }
+
   function renderMenu() {
     var container = document.getElementById('menuContainer');
     if (menu.length === 0) {
@@ -693,36 +711,40 @@
       return;
     }
     var html = '<h2><svg class="icon" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2v6a2 2 0 0 0 4 0V2M8 8v14"/><path d="M17 2c-2 3-2 6 0 8v12"/></svg>Our Menu</h2>';
-    menu.forEach(function(item) {
-      var inCart = cart.find(function(c) { return c.id === item.id; });
-      var qty = inCart ? inCart.qty : 0;
-      var hasPhoto = !!item.photo_url;
-      var rand = ((item.price_cents || 0) / 100).toFixed(0);
-      html += `
-        <div class="menu-item ${!item.available ? 'sold-out' : ''}">
-          <div class="item-photo ${hasPhoto ? '' : 'no-photo'}"
-               style="${hasPhoto ? `background-image:url('${item.photo_url}')` : ''}">
-            ${hasPhoto ? '' : (item.emoji || '🍽️')}
-            ${!item.available ? '<div class="sold-out-overlay">SOLD OUT</div>' : ''}
-          </div>
-          <div class="item-body">
-            <div class="item-info">
-              <h3>${escapeHtml(item.name)}</h3>
-              <p>${escapeHtml(item.description || '')}</p>
-              <div class="item-price">R${rand}</div>
+    var grouped = groupByCategory(menu);
+    grouped.order.forEach(function(cat) {
+      html += `<div class="category-header">${escapeHtml(cat)}</div>`;
+      grouped.groups[cat].forEach(function(item) {
+        var inCart = cart.find(function(c) { return c.id === item.id; });
+        var qty = inCart ? inCart.qty : 0;
+        var hasPhoto = !!item.photo_url;
+        var rand = ((item.price_cents || 0) / 100).toFixed(0);
+        html += `
+          <div class="menu-item ${!item.available ? 'sold-out' : ''}">
+            <div class="item-photo ${hasPhoto ? '' : 'no-photo'}"
+                 style="${hasPhoto ? `background-image:url('${item.photo_url}')` : ''}">
+              ${hasPhoto ? '' : (item.emoji || '🍽️')}
+              ${!item.available ? '<div class="sold-out-overlay">SOLD OUT</div>' : ''}
             </div>
-            ${!item.available ? '' :
-              qty > 0 ? `
-                <div class="qty-control">
-                  <button onclick="changeQty('${item.id}', -1)">−</button>
-                  <span>${qty}</span>
-                  <button onclick="changeQty('${item.id}', 1)">+</button>
-                </div>` :
-              `<button class="add-btn" onclick="changeQty('${item.id}', 1)">+</button>`
-            }
+            <div class="item-body">
+              <div class="item-info">
+                <h3>${escapeHtml(item.name)}</h3>
+                <p>${escapeHtml(item.description || '')}</p>
+                <div class="item-price">R${rand}</div>
+              </div>
+              ${!item.available ? '' :
+                qty > 0 ? `
+                  <div class="qty-control">
+                    <button onclick="changeQty('${item.id}', -1)">−</button>
+                    <span>${qty}</span>
+                    <button onclick="changeQty('${item.id}', 1)">+</button>
+                  </div>` :
+                `<button class="add-btn" onclick="changeQty('${item.id}', 1)">+</button>`
+              }
+            </div>
           </div>
-        </div>
-      `;
+        `;
+      });
     });
     container.innerHTML = html;
     updateCartBar();
@@ -1128,15 +1150,28 @@
     window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, '_blank');
   }
 
-  function clearDoneOrders() {
+  function clearDoneOrders(btn) {
+    if (btn) { btn.disabled = true; btn.textContent = 'Clearing…'; }
     db.collection('orders')
       .where('owner_id', '==', OWNER_ID)
       .where('status', '==', 'done')
       .get()
       .then(function(snapshot) {
+        if (snapshot.empty) {
+          alert('No completed orders to clear.');
+          return;
+        }
         var batch = db.batch();
         snapshot.forEach(function(doc) { batch.delete(doc.ref); });
-        return batch.commit();
+        return batch.commit().then(function() {
+          alert('Cleared ' + snapshot.size + ' completed order(s) from the database.');
+        });
+      })
+      .catch(function(err) {
+        alert('Could not clear orders: ' + err.message);
+      })
+      .finally(function() {
+        if (btn) { btn.disabled = false; btn.innerHTML = ICONS.trash + 'Clear Completed Orders'; }
       });
   }
 
@@ -1166,8 +1201,11 @@
   // MENU EDIT (owner only)
   function renderOwnerMenu() {
     var list = document.getElementById('ownerMenuList');
-    var html = '';
-    menu.forEach(function(item) {
+    var html = '<datalist id="categorySuggestions"><option value="Kotas"><option value="Chips"><option value="Drinks"><option value="Combos"><option value="Extras"></datalist>';
+    var grouped = groupByCategory(menu);
+    grouped.order.forEach(function(cat) {
+      html += `<div class="category-header">${escapeHtml(cat)}</div>`;
+      grouped.groups[cat].forEach(function(item) {
       var hasPhoto = !!item.photo_url;
       html += `
         <div class="edit-item" data-id="${item.id}">
@@ -1184,6 +1222,8 @@
             <div class="edit-fields">
               <input type="text" value="${escapeHtml(item.name)}"
                      onchange="updateMenuField('${item.id}', 'name', this.value)" placeholder="Item name" />
+              <input type="text" value="${escapeHtml(item.category||'')}" list="categorySuggestions"
+                     onchange="updateMenuField('${item.id}', 'category', this.value)" placeholder="Category (e.g. Kotas, Chips, Drinks)" />
               <input type="text" value="${escapeHtml(item.description||'')}"
                      onchange="updateMenuField('${item.id}', 'description', this.value)" placeholder="Short description" />
               <input type="text" value="${escapeHtml(item.emoji||'')}"
@@ -1206,6 +1246,7 @@
           </div>
         </div>
       `;
+      });
     });
     list.innerHTML = html;
   }
@@ -1230,7 +1271,7 @@
     }
     db.collection('menu_items').add({
       owner_id: OWNER_ID, name: 'New Item', description: '', emoji: '🍽️',
-      price_cents: 0, available: true, sort_order: menu.length,
+      category: '', price_cents: 0, available: true, sort_order: menu.length,
       created_at: firebase.firestore.FieldValue.serverTimestamp()
     }).catch(function(err) {
       alert('Could not add item: ' + err.message);
