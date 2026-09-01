@@ -4,13 +4,13 @@
 // data itself still needs a live connection — this does NOT cache
 // menu/order data, only the static app shell.
 
-var CACHE_NAME = 'ekasi-kota-hub-v2';
+var CACHE_NAME = 'ekasi-kota-hub-v3';
 var APP_SHELL = [
   './',
   './index.html',
   './manifest.json',
-  './icons/icon-192.png',
-  './icons/icon-512.png'
+  './icon-192.png',
+  './icon-512.png'
 ];
 
 self.addEventListener('install', function(event) {
